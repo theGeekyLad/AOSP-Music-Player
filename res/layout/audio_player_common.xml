@@ -82,8 +82,8 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="36dip"
-        android:paddingLeft="8dip"
-        android:paddingRight="8dip"
+        android:paddingLeft="24dip"
+        android:paddingRight="24dip"
         android:paddingBottom="4dip" />
 
 </merge>

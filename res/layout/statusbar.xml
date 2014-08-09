@@ -16,39 +16,76 @@
 ** limitations under the License.
 */
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="@android:dimen/notification_large_icon_height"
+    android:orientation="horizontal" >
 
-    <ImageView android:id="@+id/icon"
-        android:padding="4dip"
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@android:dimen/notification_large_icon_width"
+        android:layout_height="@android:dimen/notification_large_icon_height"
+        android:layout_centerVertical="true"
         android:gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:scaleType="centerInside" >
     </ImageView>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@+id/icon"
+        android:layout_toStartOf="@+id/playpause"
+        android:orientation="vertical" >
 
-        <TextView android:id="@+id/trackname"
+        <TextView
+            android:id="@+id/trackname"
             style="@android:style/TextAppearance.StatusBar.EventContent.Title"
-            android:focusable="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
             android:ellipsize="marquee"
-            android:singleLine="true"
-            android:layout_gravity="left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:focusable="true"
+            android:singleLine="true" />
 
-        <TextView android:id="@+id/artistalbum"
+        <TextView
+            android:id="@+id/artistalbum"
             style="@android:style/TextAppearance.StatusBar.EventContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:maxLines="2"
-            android:scrollHorizontally="true"
             android:ellipsize="end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:maxLines="2"
+            android:scrollHorizontally="true" />
     </LinearLayout>
-</LinearLayout>
+<!--
+    <ImageButton
+        android:id="@+id/playpause"
+        android:background="@android:drawable/ic_media_play"
+        android:padding="0dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_toLeftOf="@+id/next"
+        android:layout_centerVertical="true" />
+    
+    <ImageButton
+        android:id="@+id/next"
+        android:background="@android:drawable/ic_media_next"
+        android:padding="0dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_toLeftOf="@+id/quit"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="4dp" />
+
+    <ImageButton
+        android:id="@+id/quit"
+        android:background="@android:drawable/ic_menu_close_clear_cancel"
+        android:padding="0dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true" />
+ -->
+</RelativeLayout>

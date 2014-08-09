@@ -52,6 +52,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+import com.snovbx.music.R;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -1208,6 +1209,8 @@ public class MediaPlaybackService extends Service {
             views.setTextViewText(R.id.artistalbum,
                     getString(R.string.notification_artist_album, artist, album)
                     );
+            
+            views.setImageViewBitmap(R.id.icon, MusicUtils.getArtwork(this, getAudioId(), getAlbumId(), true));
         }
         Notification status = new Notification();
         status.contentView = views;

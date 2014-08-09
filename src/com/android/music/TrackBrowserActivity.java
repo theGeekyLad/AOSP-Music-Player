@@ -17,6 +17,7 @@
 package com.android.music;
 
 import com.android.music.MusicUtils.ServiceToken;
+import com.snovbx.music.R;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
@@ -115,7 +116,7 @@ public class TrackBrowserActivity extends ListActivity
         Intent intent = getIntent();
         if (intent != null) {
             if (intent.getBooleanExtra("withtabs", false)) {
-                requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                requestWindowFeature(Window.FEATURE_NO_TITLE);
             }
         }
         setVolumeControlStream(AudioManager.STREAM_MUSIC);

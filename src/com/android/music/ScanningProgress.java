@@ -26,6 +26,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.view.Window;
 import android.view.WindowManager;
+import com.snovbx.music.R;
 
 public class ScanningProgress extends Activity
 {

@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import com.snovbx.music.R;
 
 
 public class VerticalTextSpinner extends View {

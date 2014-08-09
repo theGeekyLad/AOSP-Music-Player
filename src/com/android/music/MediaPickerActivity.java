@@ -17,6 +17,7 @@
 package com.android.music;
 
 import com.android.music.MusicUtils.ServiceToken;
+import com.snovbx.music.R;
 
 import android.app.ListActivity;
 import android.content.Context;

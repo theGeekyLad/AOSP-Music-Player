@@ -47,6 +47,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
+import com.snovbx.music.R;
 
 import java.io.IOException;
 

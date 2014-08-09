@@ -26,6 +26,7 @@ import android.content.res.Resources;
 import android.os.Environment;
 import android.view.View;
 import android.widget.RemoteViews;
+import com.snovbx.music.R;
 
 /**
  * Simple widget to show currently playing album art along
