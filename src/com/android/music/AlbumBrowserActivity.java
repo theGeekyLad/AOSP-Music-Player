@@ -294,6 +294,9 @@ public class AlbumBrowserActivity extends ListActivity
         if (!mIsUnknownAlbum || !mIsUnknownArtist) {
             menu.add(0, SEARCH, 0, R.string.search_title);
         }
+        
+        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
+        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
     }
 
     @Override
@@ -417,6 +420,10 @@ public class AlbumBrowserActivity extends ListActivity
         super.onCreateOptionsMenu(menu);
         menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
         menu.add(0, SHUFFLE_ALL, 0, R.string.shuffle_all).setIcon(R.drawable.ic_menu_shuffle);
+
+        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
+        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
         return true;
     }
 
@@ -445,6 +452,10 @@ public class AlbumBrowserActivity extends ListActivity
                     cursor.close();
                 }
                 return true;
+                
+            case SEARCHBOX:
+            	onSearchRequested();
+            	break;
         }
         return super.onOptionsItemSelected(item);
     }

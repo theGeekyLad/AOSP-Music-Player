@@ -16,28 +16,24 @@
 
 package com.android.music;
 
-import com.android.music.MusicUtils.ServiceToken;
-import com.snovbx.music.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.KeyguardManager;
 import android.app.SearchManager;
+import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.audiofx.AudioEffect;
 import android.media.AudioManager;
+import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,14 +53,17 @@ import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.SeekBar.OnSeekBarChangeListener;
+
+import com.android.music.MusicUtils.ServiceToken;
+import com.snovbx.music.R;
+import com.snovbx.music.support.NavUtils;
 
 
 public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
@@ -517,7 +516,6 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
         // useful in those modes, so for consistency we never show them in these
         // modes, instead of tailoring them to the specific file being played.
         if (MusicUtils.getCurrentAudioId() >= 0) {
-            menu.add(0, GOTO_START, 0, R.string.goto_start).setIcon(R.drawable.ic_menu_music_library);
             menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
             SubMenu sub = menu.addSubMenu(0, ADD_TO_PLAYLIST, 0,
                     R.string.add_to_playlist).setIcon(android.R.drawable.ic_menu_add);
@@ -570,13 +568,25 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
         Intent intent;
         try {
             switch (item.getItemId()) {
-                case GOTO_START:
-                    intent = new Intent();
-                    intent.setClass(this, MusicBrowserActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
-                    break;
+            	case android.R.id.home:
+            		Intent upIntent = NavUtils.getParentActivityIntent(this);
+                    if (isTaskRoot() || NavUtils.shouldUpRecreateTask(this, upIntent)) {
+                        // This activity is NOT part of this app's task or is root, so create a new task
+                        // when navigating up, with a synthesized back stack.
+                        TaskStackBuilder.create(this)
+                            // Add all of this activity's parents to the back stack
+                            .addNextIntentWithParentStack(upIntent)
+                            // Navigate up to the closest parent
+                            .startActivities();
+                    } else {
+                        // This activity is part of this app's task, so simply
+                        // navigate up to the logical parent activity.
+                        upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        NavUtils.navigateUpTo(this, upIntent);
+                    }
+
+                    return true;
+                    
                 case USE_AS_RINGTONE: {
                     // Set the system setting to make this the current ringtone
                     if (mService != null) {

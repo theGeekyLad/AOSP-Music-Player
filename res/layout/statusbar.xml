@@ -37,6 +37,7 @@
         android:layout_marginLeft="8dp"
         android:layout_toRightOf="@+id/icon"
         android:layout_toStartOf="@+id/playpause"
+        android:layout_toLeftOf="@+id/playpause"
         android:orientation="vertical" >
 
         <TextView

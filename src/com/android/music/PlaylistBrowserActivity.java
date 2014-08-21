@@ -271,6 +271,10 @@ public class PlaylistBrowserActivity extends ListActivity
         if (!mCreateShortcut) {
             menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
         }
+        
+        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
+        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -287,6 +291,10 @@ public class PlaylistBrowserActivity extends ListActivity
             case PARTY_SHUFFLE:
                 MusicUtils.togglePartyShuffle();
                 break;
+                
+            case SEARCHBOX:
+            	onSearchRequested();
+            	break;
         }
         return super.onOptionsItemSelected(item);
     }

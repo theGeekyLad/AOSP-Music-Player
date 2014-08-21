@@ -70,11 +70,10 @@
         <activity android:name="com.android.music.MediaPlaybackActivity"
                 android:theme="@android:style/Theme.DeviceDefault"
                 android:label="@string/mediaplaybacklabel"
-                android:taskAffinity=""
-                android:launchMode="singleTask"
+                android:launchMode="singleTop"
                 android:clearTaskOnLaunch="true"
-                android:excludeFromRecents="true"
-                android:exported="true" >
+                android:exported="true"
+                android:parentActivityName="com.android.music.MusicBrowserActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -89,6 +88,10 @@
                 <action android:name="com.android.music.PLAYBACK_VIEWER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.android.music.MusicBrowserActivity" />
+            
         </activity>
 
         <activity android:name="com.android.music.AudioPreview" android:theme="@android:style/Theme.DeviceDefault.Dialog"

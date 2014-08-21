@@ -922,6 +922,10 @@ public class TrackBrowserActivity extends ListActivity
                 menu.add(0, CLEAR_PLAYLIST, 0, R.string.clear_playlist).setIcon(R.drawable.ic_menu_clear_playlist);
             }
         }
+        
+        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
+        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
         return true;
     }
 
@@ -967,6 +971,10 @@ public class TrackBrowserActivity extends ListActivity
                 // We only clear the current playlist
                 MusicUtils.clearQueue();
                 return true;
+                
+            case SEARCHBOX:
+            	onSearchRequested();
+            	break;
         }
         return super.onOptionsItemSelected(item);
     }
