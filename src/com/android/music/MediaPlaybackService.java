@@ -33,6 +33,7 @@ import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.audiofx.AudioEffect;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
@@ -52,6 +53,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
 import com.snovbx.music.R;
 
 import java.io.FileDescriptor;
@@ -813,6 +815,9 @@ public class MediaPlaybackService extends Service {
             Bitmap b = MusicUtils.getArtwork(this, getAudioId(), getAlbumId(), false);
             if (b != null) {
                 ed.putBitmap(MetadataEditor.BITMAP_KEY_ARTWORK, b);
+            } else {
+            	Bitmap no_art = BitmapFactory.decodeResource(getResources(), R.drawable.albumart_mp_unknown);
+            	ed.putBitmap(MetadataEditor.BITMAP_KEY_ARTWORK, no_art);
             }
             ed.apply();
         }
