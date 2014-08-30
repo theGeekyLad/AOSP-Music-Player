@@ -994,6 +994,17 @@ public class MediaPlaybackService extends Service {
                         mPlayPos++;
                 }
             }
+            if(mShuffleMode == SHUFFLE_NORMAL) {
+            	if(mHistory.contains(index1)) {
+            		int idx = mHistory.indexOf(index1);
+        			mHistory.set(idx, index2);
+        		} else if(mHistory.contains(index2)) {
+        			int idx = mHistory.indexOf(index2);
+        			mHistory.set(idx, index1);
+        		}
+            }
+            
+        	setNextTrack();
             notifyChange(QUEUE_CHANGED);
         }
     }
@@ -1373,6 +1384,7 @@ public class MediaPlaybackService extends Service {
             if (numUnplayed <=0) {
                 // everything's already been played
                 if (mRepeatMode == REPEAT_ALL || force) {
+                	mHistory.clear();
                     //pick from full set
                     numUnplayed = numTracks;
                     for (int i=0;i < numTracks; i++) {
