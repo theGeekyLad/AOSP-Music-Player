@@ -1753,6 +1753,7 @@ public class MediaPlaybackService extends Service {
         synchronized(this) {
             stop(false);
             mPlayPos = pos;
+            mHistory.clear();
             openCurrentAndNext();
             play();
             notifyChange(META_CHANGED);
