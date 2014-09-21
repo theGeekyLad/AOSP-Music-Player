@@ -427,6 +427,7 @@ public class TrackBrowserActivity extends ListActivity
                 long albumid = Long.valueOf(mAlbumId);
                 Bitmap bm = MusicUtils.getArtwork(TrackBrowserActivity.this, -1, albumid, false);
                 if (bm != null) {
+                    mTrackList.setBackgroundColor(0xff000000);
                     MusicUtils.setBackground(mTrackList, bm);
                     mTrackList.setCacheColorHint(0);
                     return;
@@ -434,8 +435,6 @@ public class TrackBrowserActivity extends ListActivity
             } catch (Exception ex) {
             }
         }
-        mTrackList.setBackgroundColor(0xff000000);
-        mTrackList.setCacheColorHint(0);
     }
 
     private void setTitle() {
@@ -923,8 +922,10 @@ public class TrackBrowserActivity extends ListActivity
             }
         }
         
-        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
-        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        if(mPlaylist == null) {
+	        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
+	        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
 
         return true;
     }
