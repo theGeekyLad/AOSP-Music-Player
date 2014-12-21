@@ -43,6 +43,7 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.MediaStore;
+import android.support.v4.app.NavUtils;
 import android.text.Layout;
 import android.text.TextUtils.TruncateAt;
 import android.util.Log;
@@ -63,7 +64,6 @@ import android.widget.Toast;
 
 import com.android.music.MusicUtils.ServiceToken;
 import com.snovbx.music.R;
-import com.snovbx.music.support.NavUtils;
 
 
 public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,

@@ -16,10 +16,19 @@
 
 package com.android.music;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.ref.WeakReference;
+import java.util.Random;
+import java.util.Vector;
+
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -27,14 +36,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.BroadcastReceiver;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.audiofx.AudioEffect;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
@@ -42,26 +50,23 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.RemoteControlClient;
 import android.media.RemoteControlClient.MetadataEditor;
+import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
 import android.provider.MediaStore;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.snovbx.music.R;
-
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.ref.WeakReference;
-import java.util.Random;
-import java.util.Vector;
 
 /**
  * Provides "background" audio playback capabilities, allowing the
@@ -1204,13 +1209,29 @@ public class MediaPlaybackService extends Service {
         }
     }
 
-    private void updateNotification() {
+    @SuppressLint("NewApi")
+	private void updateNotification() {
         RemoteViews views = new RemoteViews(getPackageName(), R.layout.statusbar);
         views.setImageViewResource(R.id.icon, R.drawable.stat_notify_musicplayer);
+        Bitmap artwork = MusicUtils.getArtwork(this, getAudioId(), getAlbumId(), true);
+        
+        ComponentName component_name = new ComponentName(this, MediaPlaybackService.class);
+        Intent intent = new Intent(MediaPlaybackService.TOGGLEPAUSE_ACTION);
+        intent.setComponent(component_name);
+        PendingIntent pending_intent = PendingIntent.getService(this, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.playpause, pending_intent);
+        
+        intent = new Intent(MediaPlaybackService.NEXT_ACTION);
+        intent.setComponent(component_name);
+        pending_intent = PendingIntent.getService(this, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.next, pending_intent);
+        
         if (getAudioId() < 0) {
             // streaming
             views.setTextViewText(R.id.trackname, getPath());
-            views.setTextViewText(R.id.artistalbum, null);
+            views.setTextViewText(R.id.artist, null);
+            views.setTextViewText(R.id.album, null);
+            views.setViewVisibility(R.id.next, View.GONE);
         } else {
             String artist = getArtistName();
             views.setTextViewText(R.id.trackname, getTrackName());
@@ -1222,20 +1243,24 @@ public class MediaPlaybackService extends Service {
                 album = getString(R.string.unknown_album_name);
             }
 
-            views.setTextViewText(R.id.artistalbum,
-                    getString(R.string.notification_artist_album, artist, album)
-                    );
+            views.setTextViewText(R.id.artist, artist);
+            views.setTextViewText(R.id.album, album);
             
-            views.setImageViewBitmap(R.id.icon, MusicUtils.getArtwork(this, getAudioId(), getAlbumId(), true));
+            views.setImageViewBitmap(R.id.icon, artwork);
         }
-        Notification status = new Notification();
+        Notification status = new NotificationCompat.Builder(this).build();
         status.contentView = views;
         status.flags |= Notification.FLAG_ONGOING_EVENT;
         status.icon = R.drawable.stat_notify_musicplayer;
         status.contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent("com.android.music.PLAYBACK_VIEWER")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        	status.visibility = Notification.VISIBILITY_PUBLIC;
+        	status.category = Notification.CATEGORY_TRANSPORT;
+        }
         startForeground(PLAYBACKSERVICE_STATUS, status);
+        
     }
 
     private void stop(boolean remove_status_icon) {
