@@ -25,6 +25,7 @@ import java.util.Vector;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
@@ -42,7 +43,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
@@ -157,6 +157,7 @@ public class MediaPlaybackService extends Service {
     private boolean mQueueIsSaveable = true;
     // used to track what type of audio focus loss caused the playback to pause
     private boolean mPausedByTransientLossOfFocus = false;
+    private NotificationManager mNotificationManager;
 
     private SharedPreferences mPreferences;
     // We use this to distinguish between different cards when saving/restoring playlists.
@@ -327,6 +328,8 @@ public class MediaPlaybackService extends Service {
         ComponentName rec = new ComponentName(getPackageName(),
                 MediaButtonIntentReceiver.class.getName());
         mAudioManager.registerMediaButtonEventReceiver(rec);
+        
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         Intent i = new Intent(Intent.ACTION_MEDIA_BUTTON);
         i.setComponent(rec);
@@ -1069,11 +1072,11 @@ public class MediaPlaybackService extends Service {
                 if (mOpenFailedCounter++ < 10 &&  mPlayListLen > 1) {
                     int pos = getNextPosition(false);
                     if (pos < 0) {
-                        gotoIdleState();
                         if (mIsSupposedToBePlaying) {
                             mIsSupposedToBePlaying = false;
                             notifyChange(PLAYSTATE_CHANGED);
                         }
+                        gotoIdleState();
                         return;
                     }
                     mPlayPos = pos;
@@ -1086,11 +1089,11 @@ public class MediaPlaybackService extends Service {
                         Toast.makeText(this, R.string.playback_failed, Toast.LENGTH_SHORT).show();
                     }
                     Log.d(LOGTAG, "Failed to open file for playback");
-                    gotoIdleState();
                     if (mIsSupposedToBePlaying) {
                         mIsSupposedToBePlaying = false;
                         notifyChange(PLAYSTATE_CHANGED);
                     }
+                    gotoIdleState();
                     return;
                 }
             }
@@ -1195,11 +1198,11 @@ public class MediaPlaybackService extends Service {
             mMediaplayerHandler.removeMessages(FADEDOWN);
             mMediaplayerHandler.sendEmptyMessage(FADEUP);
 
-            updateNotification();
             if (!mIsSupposedToBePlaying) {
                 mIsSupposedToBePlaying = true;
                 notifyChange(PLAYSTATE_CHANGED);
             }
+            updateNotification();
 
         } else if (mPlayListLen <= 0) {
             // This is mostly so that if you press 'play' on a bluetooth headset
@@ -1248,9 +1251,20 @@ public class MediaPlaybackService extends Service {
             
             views.setImageViewBitmap(R.id.icon, artwork);
         }
+        
+        if(mIsSupposedToBePlaying) {
+        	views.setImageViewResource(R.id.playpause, android.R.drawable.ic_media_pause);
+        } else {
+        	views.setImageViewResource(R.id.playpause, android.R.drawable.ic_media_play);
+        }
+        
         Notification status = new NotificationCompat.Builder(this).build();
         status.contentView = views;
-        status.flags |= Notification.FLAG_ONGOING_EVENT;
+        
+        if(mIsSupposedToBePlaying) {
+        	status.flags |= Notification.FLAG_ONGOING_EVENT;
+        }
+        
         status.icon = R.drawable.stat_notify_musicplayer;
         status.contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent("com.android.music.PLAYBACK_VIEWER")
@@ -1259,8 +1273,8 @@ public class MediaPlaybackService extends Service {
         	status.visibility = Notification.VISIBILITY_PUBLIC;
         	status.category = Notification.CATEGORY_TRANSPORT;
         }
-        startForeground(PLAYBACKSERVICE_STATUS, status);
         
+        mNotificationManager.notify(PLAYBACKSERVICE_STATUS, status);
     }
 
     private void stop(boolean remove_status_icon) {
@@ -1272,13 +1286,10 @@ public class MediaPlaybackService extends Service {
             mCursor.close();
             mCursor = null;
         }
-        if (remove_status_icon) {
-            gotoIdleState();
-        } else {
-            stopForeground(false);
-        }
+        
         if (remove_status_icon) {
             mIsSupposedToBePlaying = false;
+            gotoIdleState();
         }
     }
 
@@ -1297,10 +1308,10 @@ public class MediaPlaybackService extends Service {
             mMediaplayerHandler.removeMessages(FADEUP);
             if (isPlaying()) {
                 mPlayer.pause();
-                gotoIdleState();
                 mIsSupposedToBePlaying = false;
                 notifyChange(PLAYSTATE_CHANGED);
                 saveBookmarkIfNeeded();
+                gotoIdleState();
             }
         }
     }
@@ -1459,11 +1470,11 @@ public class MediaPlaybackService extends Service {
 
             int pos = getNextPosition(force);
             if (pos < 0) {
-                gotoIdleState();
                 if (mIsSupposedToBePlaying) {
                     mIsSupposedToBePlaying = false;
                     notifyChange(PLAYSTATE_CHANGED);
                 }
+                gotoIdleState();
                 return;
             }
             mPlayPos = pos;
@@ -1480,7 +1491,7 @@ public class MediaPlaybackService extends Service {
         mDelayedStopHandler.removeCallbacksAndMessages(null);
         Message msg = mDelayedStopHandler.obtainMessage();
         mDelayedStopHandler.sendMessageDelayed(msg, IDLE_DELAY);
-        stopForeground(true);
+        updateNotification();
     }
     
     private void saveBookmarkIfNeeded() {
