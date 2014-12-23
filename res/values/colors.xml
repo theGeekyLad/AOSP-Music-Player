@@ -18,6 +18,9 @@
     <color name="appwidget_text">#ffffffff</color>
 
     <color name="transparent">#00000000</color>
-
+    
+    <color name="colorPrimary">#393939</color>
+    <color name="colorPrimaryDark">#303030</color>
+    <color name="colorAccent">#bbbbbb</color>
 </resources>
 

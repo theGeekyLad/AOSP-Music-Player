@@ -20,7 +20,7 @@
         android:versionCode="0">
 
     <original-package android:name="com.android.music" />
-    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="21"/>
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="21"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -33,13 +33,13 @@
         android:label="@string/musicbrowserlabel"
         android:taskAffinity="android.task.music"
         android:allowTaskReparenting="true"
-        android:allowBackup="true">
+        android:allowBackup="true"
+        android:theme="@style/Theme.Music">
         <meta-data
             android:name="android.app.default_searchable"
             android:value="com.android.music.QueryBrowserActivity"
         />
         <activity android:name="com.android.music.MusicBrowserActivity"
-            android:theme="@style/Theme.AppCompat"
             android:exported="true"
         >
             <intent-filter>
@@ -68,7 +68,6 @@
              recents since this is accessible through a notification when
              appropriate. -->
         <activity android:name="com.android.music.MediaPlaybackActivity"
-                android:theme="@style/Theme.AppCompat.CompactMenu"
                 android:label="@string/mediaplaybacklabel"
                 android:launchMode="singleTop"
                 android:clearTaskOnLaunch="true"
@@ -94,7 +93,7 @@
             
         </activity>
 
-        <activity android:name="com.android.music.AudioPreview" android:theme="@style/Theme.AppCompat.Dialog"
+        <activity android:name="com.android.music.AudioPreview" android:theme="@style/Theme.Music.Dialog"
                 android:taskAffinity=""
                 android:excludeFromRecents="true" android:exported="true" >
             <intent-filter>
@@ -159,7 +158,6 @@
             </intent-filter>
         </activity>
         <activity android:name="com.android.music.QueryBrowserActivity"
-                android:theme="@style/Theme.AppCompat.NoActionBar"
                 android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -261,15 +259,15 @@
             </intent-filter>
         </activity>
         <activity android:name="com.android.music.CreatePlaylist"
-            android:theme="@style/Theme.AppCompat.Dialog" android:exported="false" />
+            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
         <activity android:name="com.android.music.RenamePlaylist"
-            android:theme="@style/Theme.AppCompat.Dialog" android:exported="false" />
+            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
         <activity android:name="com.android.music.WeekSelector"
-            android:theme="@style/Theme.AppCompat.Dialog" android:exported="false" />
+            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
         <activity android:name="com.android.music.DeleteItems"
-            android:theme="@style/Theme.AppCompat.Dialog" android:exported="false" />
+            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
         <activity android:name="com.android.music.ScanningProgress"
-            android:theme="@style/Theme.AppCompat.Dialog" android:exported="false" />
+            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
         <service android:name="com.android.music.MediaPlaybackService"
             android:exported="false" />
 

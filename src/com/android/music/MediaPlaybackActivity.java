@@ -16,7 +16,6 @@
 
 package com.android.music;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.KeyguardManager;
 import android.app.SearchManager;
@@ -44,6 +43,8 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Layout;
 import android.text.TextUtils.TruncateAt;
 import android.util.Log;
@@ -66,8 +67,7 @@ import com.android.music.MusicUtils.ServiceToken;
 import com.snovbx.music.R;
 
 
-public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
-    View.OnTouchListener, View.OnLongClickListener
+public class MediaPlaybackActivity extends ActionBarActivity implements MusicUtils.Defs
 {
     private static final int USE_AS_RINGTONE = CHILD_MENU_BASE;
 
@@ -81,7 +81,6 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
     private RepeatingImageButton mNextButton;
     private ImageButton mRepeatButton;
     private ImageButton mShuffleButton;
-    private ImageButton mQueueButton;
     private Worker mAlbumArtWorker;
     private AlbumArtHandler mAlbumArtHandler;
     private Toast mToast;
@@ -102,28 +101,18 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
         mAlbumArtWorker = new Worker("album art worker");
         mAlbumArtHandler = new AlbumArtHandler(mAlbumArtWorker.getLooper());
 
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.audio_player);
+        
+        Toolbar toolbar = (Toolbar) findViewById(R.id.mediaplayback_toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mCurrentTime = (TextView) findViewById(R.id.currenttime);
         mTotalTime = (TextView) findViewById(R.id.totaltime);
         mProgress = (ProgressBar) findViewById(android.R.id.progress);
         mAlbum = (ImageView) findViewById(R.id.album);
-        mArtistName = (TextView) findViewById(R.id.artistname);
-        mAlbumName = (TextView) findViewById(R.id.albumname);
-        mTrackName = (TextView) findViewById(R.id.trackname);
-
-        View v = (View)mArtistName.getParent(); 
-        v.setOnTouchListener(this);
-        v.setOnLongClickListener(this);
-
-        v = (View)mAlbumName.getParent();
-        v.setOnTouchListener(this);
-        v.setOnLongClickListener(this);
-
-        v = (View)mTrackName.getParent();
-        v.setOnTouchListener(this);
-        v.setOnLongClickListener(this);
         
         mPrevButton = (RepeatingImageButton) findViewById(R.id.prev);
         mPrevButton.setOnClickListener(mPrevListener);
@@ -139,8 +128,6 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
         mDeviceHasDpad = (getResources().getConfiguration().navigation ==
             Configuration.NAVIGATION_DPAD);
         
-        mQueueButton = (ImageButton) findViewById(R.id.curplaylist);
-        mQueueButton.setOnClickListener(mQueueListener);
         mShuffleButton = ((ImageButton) findViewById(R.id.shuffle));
         mShuffleButton.setOnClickListener(mShuffleListener);
         mRepeatButton = ((ImageButton) findViewById(R.id.repeat));
@@ -160,89 +147,6 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
     int mTextWidth = 0;
     int mViewWidth = 0;
     boolean mDraggingLabel = false;
-    
-    TextView textViewForContainer(View v) {
-        View vv = v.findViewById(R.id.artistname);
-        if (vv != null) return (TextView) vv;
-        vv = v.findViewById(R.id.albumname);
-        if (vv != null) return (TextView) vv;
-        vv = v.findViewById(R.id.trackname);
-        if (vv != null) return (TextView) vv;
-        return null;
-    }
-    
-    public boolean onTouch(View v, MotionEvent event) {
-        int action = event.getAction();
-        TextView tv = textViewForContainer(v);
-        if (tv == null) {
-            return false;
-        }
-        if (action == MotionEvent.ACTION_DOWN) {
-            v.setBackgroundColor(0xff606060);
-            mInitialX = mLastX = (int) event.getX();
-            mDraggingLabel = false;
-        } else if (action == MotionEvent.ACTION_UP ||
-                action == MotionEvent.ACTION_CANCEL) {
-            v.setBackgroundColor(0);
-            if (mDraggingLabel) {
-                Message msg = mLabelScroller.obtainMessage(0, tv);
-                mLabelScroller.sendMessageDelayed(msg, 1000);
-            }
-        } else if (action == MotionEvent.ACTION_MOVE) {
-            if (mDraggingLabel) {
-                int scrollx = tv.getScrollX();
-                int x = (int) event.getX();
-                int delta = mLastX - x;
-                if (delta != 0) {
-                    mLastX = x;
-                    scrollx += delta;
-                    if (scrollx > mTextWidth) {
-                        // scrolled the text completely off the view to the left
-                        scrollx -= mTextWidth;
-                        scrollx -= mViewWidth;
-                    }
-                    if (scrollx < -mViewWidth) {
-                        // scrolled the text completely off the view to the right
-                        scrollx += mViewWidth;
-                        scrollx += mTextWidth;
-                    }
-                    tv.scrollTo(scrollx, 0);
-                }
-                return true;
-            }
-            int delta = mInitialX - (int) event.getX();
-            if (Math.abs(delta) > mTouchSlop) {
-                // start moving
-                mLabelScroller.removeMessages(0, tv);
-                
-                // Only turn ellipsizing off when it's not already off, because it
-                // causes the scroll position to be reset to 0.
-                if (tv.getEllipsize() != null) {
-                    tv.setEllipsize(null);
-                }
-                Layout ll = tv.getLayout();
-                // layout might be null if the text just changed, or ellipsizing
-                // was just turned off
-                if (ll == null) {
-                    return false;
-                }
-                // get the non-ellipsized line width, to determine whether scrolling
-                // should even be allowed
-                mTextWidth = (int) tv.getLayout().getLineWidth(0);
-                mViewWidth = tv.getWidth();
-                if (mViewWidth > mTextWidth) {
-                    tv.setEllipsize(TruncateAt.END);
-                    v.cancelLongPress();
-                    return false;
-                }
-                mDraggingLabel = true;
-                tv.setHorizontalFadingEdgeEnabled(true);
-                v.cancelLongPress();
-                return true;
-            }
-        }
-        return false; 
-    }
 
     Handler mLabelScroller = new Handler() {
         @Override
@@ -260,108 +164,6 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
         }
     };
     
-    public boolean onLongClick(View view) {
-
-        CharSequence title = null;
-        String mime = null;
-        String query = null;
-        String artist;
-        String album;
-        String song;
-        long audioid;
-        
-        try {
-            artist = mService.getArtistName();
-            album = mService.getAlbumName();
-            song = mService.getTrackName();
-            audioid = mService.getAudioId();
-        } catch (RemoteException ex) {
-            return true;
-        } catch (NullPointerException ex) {
-            // we might not actually have the service yet
-            return true;
-        }
-
-        if (MediaStore.UNKNOWN_STRING.equals(album) &&
-                MediaStore.UNKNOWN_STRING.equals(artist) &&
-                song != null &&
-                song.startsWith("recording")) {
-            // not music
-            return false;
-        }
-
-        if (audioid < 0) {
-            return false;
-        }
-
-        Cursor c = MusicUtils.query(this,
-                ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, audioid),
-                new String[] {MediaStore.Audio.Media.IS_MUSIC}, null, null, null);
-        boolean ismusic = true;
-        if (c != null) {
-            if (c.moveToFirst()) {
-                ismusic = c.getInt(0) != 0;
-            }
-            c.close();
-        }
-        if (!ismusic) {
-            return false;
-        }
-
-        boolean knownartist =
-            (artist != null) && !MediaStore.UNKNOWN_STRING.equals(artist);
-
-        boolean knownalbum =
-            (album != null) && !MediaStore.UNKNOWN_STRING.equals(album);
-        
-        if (knownartist && view.equals(mArtistName.getParent())) {
-            title = artist;
-            query = artist;
-            mime = MediaStore.Audio.Artists.ENTRY_CONTENT_TYPE;
-        } else if (knownalbum && view.equals(mAlbumName.getParent())) {
-            title = album;
-            if (knownartist) {
-                query = artist + " " + album;
-            } else {
-                query = album;
-            }
-            mime = MediaStore.Audio.Albums.ENTRY_CONTENT_TYPE;
-        } else if (view.equals(mTrackName.getParent()) || !knownartist || !knownalbum) {
-            if ((song == null) || MediaStore.UNKNOWN_STRING.equals(song)) {
-                // A popup of the form "Search for null/'' using ..." is pretty
-                // unhelpful, plus, we won't find any way to buy it anyway.
-                return true;
-            }
-
-            title = song;
-            if (knownartist) {
-                query = artist + " " + song;
-            } else {
-                query = song;
-            }
-            mime = "audio/*"; // the specific type doesn't matter, so don't bother retrieving it
-        } else {
-            throw new RuntimeException("shouldn't be here");
-        }
-        title = getString(R.string.mediasearch, title);
-
-        Intent i = new Intent();
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.setAction(MediaStore.INTENT_ACTION_MEDIA_SEARCH);
-        i.putExtra(SearchManager.QUERY, query);
-        if(knownartist) {
-            i.putExtra(MediaStore.EXTRA_MEDIA_ARTIST, artist);
-        }
-        if(knownalbum) {
-            i.putExtra(MediaStore.EXTRA_MEDIA_ALBUM, album);
-        }
-        i.putExtra(MediaStore.EXTRA_MEDIA_TITLE, song);
-        i.putExtra(MediaStore.EXTRA_MEDIA_FOCUS, mime);
-
-        startActivity(Intent.createChooser(i, title));
-        return true;
-    }
-
     private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
         public void onStartTrackingTouch(SeekBar bar) {
             mLastSeekEventTime = 0;
@@ -388,16 +190,6 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
         public void onStopTrackingTouch(SeekBar bar) {
             mPosOverride = -1;
             mFromTouch = false;
-        }
-    };
-    
-    private View.OnClickListener mQueueListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            startActivity(
-                    new Intent(Intent.ACTION_EDIT)
-                    .setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track")
-                    .putExtra("playlist", "nowplaying")
-            );
         }
     };
     
@@ -525,6 +317,10 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
                     .setIcon(R.drawable.ic_menu_set_as_ringtone);
             menu.add(1, DELETE_ITEM, 0, R.string.delete_item)
                     .setIcon(R.drawable.ic_menu_delete);
+            
+            menu.add(0, QUEUE, 0, R.string.queue)
+            		.setIcon(R.drawable.ic_mp_current_playlist_btn)
+            		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
             Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
             if (getPackageManager().resolveActivity(i, 0) != null) {
@@ -641,6 +437,14 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
                     startActivityForResult(i, EFFECTS_PANEL);
                     return true;
                 }
+                
+                case QUEUE:
+                	startActivity(
+                            new Intent(Intent.ACTION_EDIT)
+                            .setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track")
+                            .putExtra("playlist", "nowplaying")
+                    );
+                	return true;
             }
         } catch (RemoteException ex) {
         }
@@ -1079,7 +883,6 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
                         // something is playing now, we're done
                         mRepeatButton.setVisibility(View.VISIBLE);
                         mShuffleButton.setVisibility(View.VISIBLE);
-                        mQueueButton.setVisibility(View.VISIBLE);
                         setRepeatButtonImage();
                         setShuffleButtonImage();
                         setPauseButtonImage();
@@ -1153,9 +956,6 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
     private ImageView mAlbum;
     private TextView mCurrentTime;
     private TextView mTotalTime;
-    private TextView mArtistName;
-    private TextView mAlbumName;
-    private TextView mTrackName;
     private ProgressBar mProgress;
     private long mPosOverride = -1;
     private boolean mFromTouch = false;
@@ -1292,28 +1092,24 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs,
             if (songid < 0 && path.toLowerCase().startsWith("http://")) {
                 // Once we can get album art and meta data from MediaPlayer, we
                 // can show that info again when streaming.
-                ((View) mArtistName.getParent()).setVisibility(View.INVISIBLE);
-                ((View) mAlbumName.getParent()).setVisibility(View.INVISIBLE);
+                getSupportActionBar().setSubtitle("");
                 mAlbum.setVisibility(View.GONE);
-                mTrackName.setText(path);
+                getSupportActionBar().setTitle(path);
                 mAlbumArtHandler.removeMessages(GET_ALBUM_ART);
                 mAlbumArtHandler.obtainMessage(GET_ALBUM_ART, new AlbumSongIdWrapper(-1, -1)).sendToTarget();
             } else {
-                ((View) mArtistName.getParent()).setVisibility(View.VISIBLE);
-                ((View) mAlbumName.getParent()).setVisibility(View.VISIBLE);
                 String artistName = mService.getArtistName();
                 if (MediaStore.UNKNOWN_STRING.equals(artistName)) {
                     artistName = getString(R.string.unknown_artist_name);
                 }
-                mArtistName.setText(artistName);
+                getSupportActionBar().setSubtitle(artistName);
                 String albumName = mService.getAlbumName();
                 long albumid = mService.getAlbumId();
                 if (MediaStore.UNKNOWN_STRING.equals(albumName)) {
                     albumName = getString(R.string.unknown_album_name);
                     albumid = -1;
                 }
-                mAlbumName.setText(albumName);
-                mTrackName.setText(mService.getTrackName());
+                getSupportActionBar().setTitle(mService.getTrackName());
                 mAlbumArtHandler.removeMessages(GET_ALBUM_ART);
                 mAlbumArtHandler.obtainMessage(GET_ALBUM_ART, new AlbumSongIdWrapper(albumid, songid)).sendToTarget();
                 mAlbum.setVisibility(View.VISIBLE);
