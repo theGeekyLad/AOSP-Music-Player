@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
-import com.android.music.MusicUtils.ServiceToken;
 import com.snovbx.music.R;
+import com.snovbx.music.MusicUtils.ServiceToken;
 
 import android.app.ListActivity;
 import android.content.AsyncQueryHandler;
@@ -386,6 +386,7 @@ public class PlaylistBrowserActivity extends ListActivity
         if (mCreateShortcut) {
             final Intent shortcut = new Intent();
             shortcut.setAction(Intent.ACTION_VIEW);
+            shortcut.setPackage("com.snovbx.music");
             shortcut.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/playlist");
             shortcut.putExtra("playlist", String.valueOf(id));
 
@@ -401,16 +402,19 @@ public class PlaylistBrowserActivity extends ListActivity
         }
         if (id == RECENTLY_ADDED_PLAYLIST) {
             Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setPackage("com.snovbx.music");
             intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track");
             intent.putExtra("playlist", "recentlyadded");
             startActivity(intent);
         } else if (id == PODCASTS_PLAYLIST) {
             Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setPackage("com.snovbx.music");
             intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track");
             intent.putExtra("playlist", "podcasts");
             startActivity(intent);
         } else {
             Intent intent = new Intent(Intent.ACTION_EDIT);
+            intent.setPackage("com.snovbx.music");
             intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track");
             intent.putExtra("playlist", Long.valueOf(id).toString());
             startActivity(intent);

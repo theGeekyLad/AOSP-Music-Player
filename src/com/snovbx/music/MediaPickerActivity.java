@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
-import com.android.music.MusicUtils.ServiceToken;
 import com.snovbx.music.R;
+import com.snovbx.music.MusicUtils.ServiceToken;
 
 import android.app.ListActivity;
 import android.content.Context;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -57,6 +57,8 @@ import android.view.Window;
 import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.snovbx.music.IMediaPlaybackService;
 import com.snovbx.music.R;
 
 import java.io.File;
@@ -823,7 +825,7 @@ public class MusicUtils {
             sService.play();
         } catch (RemoteException ex) {
         } finally {
-            Intent intent = new Intent("com.android.music.PLAYBACK_VIEWER")
+            Intent intent = new Intent("com.snovbx.music.PLAYBACK_VIEWER")
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intent);
         }
@@ -1226,6 +1228,7 @@ public class MusicUtils {
             default:
                 return;
         }
+        intent.setPackage("com.snovbx.music");
         intent.putExtra("withtabs", true);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         a.startActivity(intent);

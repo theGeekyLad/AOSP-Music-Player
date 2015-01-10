@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
-import com.android.music.MusicUtils.ServiceToken;
 import com.snovbx.music.R;
+import com.snovbx.music.MusicUtils.ServiceToken;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.media.AudioManager;
@@ -111,6 +110,7 @@ implements MusicUtils.Defs, ServiceConnection
             } else if (path.startsWith("content://media/external/audio/albums/")) {
                 // This is an album, show the songs on it
                 Intent i = new Intent(Intent.ACTION_PICK);
+                i.setPackage("com.snovbx.music");
                 i.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track");
                 i.putExtra("album", uri.getLastPathSegment());
                 startActivity(i);
@@ -119,6 +119,7 @@ implements MusicUtils.Defs, ServiceConnection
             } else if (path.startsWith("content://media/external/audio/artists/")) {
                 // This is an artist, show the albums for that artist
                 Intent i = new Intent(Intent.ACTION_PICK);
+                i.setPackage("com.snovbx.music");
                 i.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/album");
                 i.putExtra("artist", uri.getLastPathSegment());
                 startActivity(i);
@@ -286,12 +287,14 @@ implements MusicUtils.Defs, ServiceConnection
         if ("artist".equals(selectedType)) {
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setPackage("com.snovbx.music");
             intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/album");
             intent.putExtra("artist", Long.valueOf(id).toString());
             startActivity(intent);
         } else if ("album".equals(selectedType)) {
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setPackage("com.snovbx.music");
             intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track");
             intent.putExtra("album", Long.valueOf(id).toString());
             startActivity(intent);

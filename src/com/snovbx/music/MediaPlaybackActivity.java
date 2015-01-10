@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
 import android.app.AlertDialog;
 import android.app.KeyguardManager;
 import android.app.SearchManager;
-import android.app.TaskStackBuilder;
+import android.support.v4.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -63,8 +63,9 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.music.MusicUtils.ServiceToken;
+import com.snovbx.music.IMediaPlaybackService;
 import com.snovbx.music.R;
+import com.snovbx.music.MusicUtils.ServiceToken;
 
 
 public class MediaPlaybackActivity extends ActionBarActivity implements MusicUtils.Defs
@@ -441,6 +442,7 @@ public class MediaPlaybackActivity extends ActionBarActivity implements MusicUti
                 case QUEUE:
                 	startActivity(
                             new Intent(Intent.ACTION_EDIT)
+                            .setPackage("com.snovbx.music")
                             .setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track")
                             .putExtra("playlist", "nowplaying")
                     );

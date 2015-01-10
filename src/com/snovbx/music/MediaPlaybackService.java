@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -22,8 +22,8 @@ import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.util.Random;
 import java.util.Vector;
-
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -65,7 +65,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
-
+import com.snovbx.music.IMediaPlaybackService;
 import com.snovbx.music.R;
 
 /**
@@ -90,11 +90,11 @@ public class MediaPlaybackService extends Service {
     public static final int REPEAT_CURRENT = 1;
     public static final int REPEAT_ALL = 2;
 
-    public static final String PLAYSTATE_CHANGED = "com.android.music.playstatechanged";
-    public static final String META_CHANGED = "com.android.music.metachanged";
-    public static final String QUEUE_CHANGED = "com.android.music.queuechanged";
+    public static final String PLAYSTATE_CHANGED = "com.snovbx.music.playstatechanged";
+    public static final String META_CHANGED = "com.snovbx.music.metachanged";
+    public static final String QUEUE_CHANGED = "com.snovbx.music.queuechanged";
 
-    public static final String SERVICECMD = "com.android.music.musicservicecommand";
+    public static final String SERVICECMD = "com.snovbx.music.musicservicecommand";
     public static final String CMDNAME = "command";
     public static final String CMDTOGGLEPAUSE = "togglepause";
     public static final String CMDSTOP = "stop";
@@ -103,10 +103,10 @@ public class MediaPlaybackService extends Service {
     public static final String CMDPREVIOUS = "previous";
     public static final String CMDNEXT = "next";
 
-    public static final String TOGGLEPAUSE_ACTION = "com.android.music.musicservicecommand.togglepause";
-    public static final String PAUSE_ACTION = "com.android.music.musicservicecommand.pause";
-    public static final String PREVIOUS_ACTION = "com.android.music.musicservicecommand.previous";
-    public static final String NEXT_ACTION = "com.android.music.musicservicecommand.next";
+    public static final String TOGGLEPAUSE_ACTION = "com.snovbx.music.musicservicecommand.togglepause";
+    public static final String PAUSE_ACTION = "com.snovbx.music.musicservicecommand.pause";
+    public static final String PREVIOUS_ACTION = "com.snovbx.music.musicservicecommand.previous";
+    public static final String NEXT_ACTION = "com.snovbx.music.musicservicecommand.next";
 
     private static final int TRACK_ENDED = 1;
     private static final int RELEASE_WAKELOCK = 2;
@@ -791,10 +791,10 @@ public class MediaPlaybackService extends Service {
      * "album" - String: the name of the album
      * "track" - String: the name of the track
      * The intent has an action that is one of
-     * "com.android.music.metachanged"
-     * "com.android.music.queuechanged",
-     * "com.android.music.playbackcomplete"
-     * "com.android.music.playstatechanged"
+     * "com.snovbx.music.metachanged"
+     * "com.snovbx.music.queuechanged",
+     * "com.snovbx.music.playbackcomplete"
+     * "com.snovbx.music.playstatechanged"
      * respectively indicating that a new track has
      * started playing, that the playback queue has
      * changed, that playback has stopped because
@@ -1267,7 +1267,7 @@ public class MediaPlaybackService extends Service {
         
         status.icon = R.drawable.stat_notify_musicplayer;
         status.contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent("com.android.music.PLAYBACK_VIEWER")
+                new Intent("com.snovbx.music.PLAYBACK_VIEWER")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         	status.visibility = Notification.VISIBILITY_PUBLIC;
@@ -1965,7 +1965,8 @@ public class MediaPlaybackService extends Service {
             return true;
         }
 
-        public void setNextDataSource(String path) {
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+		public void setNextDataSource(String path) {
             mCurrentMediaPlayer.setNextMediaPlayer(null);
             if (mNextMediaPlayer != null) {
                 mNextMediaPlayer.release();
@@ -2100,7 +2101,8 @@ public class MediaPlaybackService extends Service {
             }
         }
 
-        public void setNextMediaPlayer(MediaPlayer next) {
+        @SuppressLint("NewApi")
+		public void setNextMediaPlayer(MediaPlayer next) {
             if (mCompatMode) {
                 mNextPlayer = next;
             } else {

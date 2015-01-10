@@ -21,8 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_marginBottom="2dip"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="1dip"
         android:gravity="center"
         android:orientation="horizontal" >
@@ -33,7 +31,7 @@
             android:layout_height="48dp"
             android:background="?android:selectableItemBackground" />
 
-        <com.android.music.RepeatingImageButton
+        <com.snovbx.music.RepeatingImageButton
             android:id="@+id/prev"
             style="@android:style/MediaButton.Previous"
             android:layout_width="48dp"
@@ -47,7 +45,7 @@
             style="@android:style/MediaButton.Play"
             android:background="?android:selectableItemBackground" />
 
-        <com.android.music.RepeatingImageButton
+        <com.snovbx.music.RepeatingImageButton
             android:id="@+id/next"
             style="@android:style/MediaButton.Next"
             android:layout_width="48dp"

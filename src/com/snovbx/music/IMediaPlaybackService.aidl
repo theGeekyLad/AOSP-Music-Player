@@ -15,7 +15,7 @@
 ** limitations under the License.
 */
 
-package com.android.music;
+package com.snovbx.music;
 
 import android.graphics.Bitmap;
 

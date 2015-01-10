@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
-import com.android.music.MusicUtils.ServiceToken;
-import com.android.music.QueryBrowserActivity.QueryListAdapter.QueryHandler;
 import com.snovbx.music.R;
+import com.snovbx.music.MusicUtils.ServiceToken;
+import com.snovbx.music.QueryBrowserActivity.QueryListAdapter.QueryHandler;
 
 import android.app.ExpandableListActivity;
 import android.app.SearchManager;
@@ -267,6 +267,7 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
         mCurrentAlbumId = Long.valueOf(id).toString();
         
         Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setPackage("com.snovbx.music");
         intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track");
         intent.putExtra("album", mCurrentAlbumId);
         Cursor c = (Cursor) getExpandableListAdapter().getChild(groupPosition, childPosition);

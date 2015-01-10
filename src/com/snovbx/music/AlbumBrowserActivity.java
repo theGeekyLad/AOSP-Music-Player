@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
-import com.android.music.MusicUtils.ServiceToken;
 import com.snovbx.music.R;
+import com.snovbx.music.MusicUtils.ServiceToken;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
@@ -409,6 +409,7 @@ public class AlbumBrowserActivity extends ListActivity
     protected void onListItemClick(ListView l, View v, int position, long id)
     {
         Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setPackage("com.snovbx.music");
         intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track");
         intent.putExtra("album", Long.valueOf(id).toString());
         intent.putExtra("artist", mArtistId);

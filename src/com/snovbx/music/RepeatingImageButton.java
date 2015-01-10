@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.music;
+package com.snovbx.music;
 
 import android.content.Context;
 import android.os.SystemClock;
