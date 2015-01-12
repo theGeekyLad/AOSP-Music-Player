@@ -34,7 +34,7 @@
         android:taskAffinity="android.task.music"
         android:allowTaskReparenting="true"
         android:allowBackup="true"
-        android:theme="@style/Theme.Music">
+        android:theme="@android:style/Theme.DeviceDefault">
         <meta-data
             android:name="android.app.default_searchable"
             android:value="com.snovbx.music.QueryBrowserActivity"
@@ -71,7 +71,7 @@
                 android:label="@string/mediaplaybacklabel"
                 android:launchMode="singleTop"
                 android:clearTaskOnLaunch="true"
-                android:exported="true"
+                android:exported="true" 
                 android:parentActivityName="com.snovbx.music.MusicBrowserActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -93,7 +93,7 @@
             
         </activity>
 
-        <activity android:name="com.snovbx.music.AudioPreview" android:theme="@style/Theme.Music.Dialog"
+        <activity android:name="com.snovbx.music.AudioPreview" android:theme="@android:style/Theme.DeviceDefault.Dialog"
                 android:taskAffinity=""
                 android:excludeFromRecents="true" android:exported="true" >
             <intent-filter>
@@ -220,15 +220,15 @@
             </intent-filter>
         </activity>
         <activity android:name="com.snovbx.music.CreatePlaylist"
-            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
+            android:theme="@android:style/Theme.DeviceDefault.Dialog" android:exported="false" />
         <activity android:name="com.snovbx.music.RenamePlaylist"
-            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
+            android:theme="@android:style/Theme.DeviceDefault.Dialog" android:exported="false" />
         <activity android:name="com.snovbx.music.WeekSelector"
-            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
+            android:theme="@android:style/Theme.DeviceDefault.Dialog" android:exported="false" />
         <activity android:name="com.snovbx.music.DeleteItems"
-            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
+            android:theme="@android:style/Theme.DeviceDefault.Dialog" android:exported="false" />
         <activity android:name="com.snovbx.music.ScanningProgress"
-            android:theme="@style/Theme.Music.Dialog" android:exported="false" />
+            android:theme="@android:style/Theme.DeviceDefault.Dialog" android:exported="false" />
         <service android:name="com.snovbx.music.MediaPlaybackService"
             android:exported="false" />
 

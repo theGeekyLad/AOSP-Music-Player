@@ -281,19 +281,20 @@ public class MusicUtils {
     }
     
     public static void setPartyShuffleMenuIcon(Menu menu) {
-        MenuItem item = menu.findItem(Defs.PARTY_SHUFFLE);
+    	MenuItem item = menu.findItem(Defs.PARTY_SHUFFLE);
         if (item != null) {
             int shuffle = MusicUtils.getCurrentShuffleMode();
+            item.setCheckable(true);
+            item.setTitle(R.string.party_shuffle);
+            item.setIcon(R.drawable.ic_menu_party_shuffle);
             if (shuffle == MediaPlaybackService.SHUFFLE_AUTO) {
-                item.setIcon(R.drawable.ic_menu_party_shuffle);
-                item.setTitle(R.string.party_shuffle_off);
+                item.setChecked(true);
             } else {
-                item.setIcon(R.drawable.ic_menu_party_shuffle);
-                item.setTitle(R.string.party_shuffle);
+            	item.setChecked(false);
             }
         }
     }
-    
+
     /*
      * Returns true if a file is currently opened for playback (regardless
      * of whether it's playing or paused).

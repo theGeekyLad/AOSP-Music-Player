@@ -16,20 +16,17 @@
 
 package com.snovbx.music;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.KeyguardManager;
-import android.app.SearchManager;
-import android.support.v4.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
@@ -43,15 +40,12 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Layout;
+import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils.TruncateAt;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -63,12 +57,10 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.snovbx.music.IMediaPlaybackService;
-import com.snovbx.music.R;
 import com.snovbx.music.MusicUtils.ServiceToken;
 
 
-public class MediaPlaybackActivity extends ActionBarActivity implements MusicUtils.Defs
+public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs
 {
     private static final int USE_AS_RINGTONE = CHILD_MENU_BASE;
 
@@ -104,11 +96,7 @@ public class MediaPlaybackActivity extends ActionBarActivity implements MusicUti
 
         setContentView(R.layout.audio_player);
         
-        Toolbar toolbar = (Toolbar) findViewById(R.id.mediaplayback_toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-        }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         mCurrentTime = (TextView) findViewById(R.id.currenttime);
         mTotalTime = (TextView) findViewById(R.id.totaltime);
@@ -149,7 +137,7 @@ public class MediaPlaybackActivity extends ActionBarActivity implements MusicUti
     int mViewWidth = 0;
     boolean mDraggingLabel = false;
 
-    Handler mLabelScroller = new Handler() {
+    static Handler mLabelScroller = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             TextView tv = (TextView) msg.obj;
@@ -335,20 +323,10 @@ public class MediaPlaybackActivity extends ActionBarActivity implements MusicUti
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (mService == null) return false;
-        MenuItem item = menu.findItem(PARTY_SHUFFLE);
-        if (item != null) {
-            int shuffle = MusicUtils.getCurrentShuffleMode();
-            if (shuffle == MediaPlaybackService.SHUFFLE_AUTO) {
-                item.setIcon(R.drawable.ic_menu_party_shuffle);
-                item.setTitle(R.string.party_shuffle_off);
-            } else {
-                item.setIcon(R.drawable.ic_menu_party_shuffle);
-                item.setTitle(R.string.party_shuffle);
-            }
-        }
+        //if (mService == null) return false;
+        MusicUtils.setPartyShuffleMenuIcon(menu);
 
-        item = menu.findItem(ADD_TO_PLAYLIST);
+        MenuItem  item = menu.findItem(ADD_TO_PLAYLIST);
         if (item != null) {
             SubMenu sub = item.getSubMenu();
             MusicUtils.makePlaylistMenu(this, sub);
@@ -357,7 +335,7 @@ public class MediaPlaybackActivity extends ActionBarActivity implements MusicUti
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
         menu.setGroupVisible(1, !km.inKeyguardRestrictedInputMode());
 
-        return true;
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -1094,9 +1072,9 @@ public class MediaPlaybackActivity extends ActionBarActivity implements MusicUti
             if (songid < 0 && path.toLowerCase().startsWith("http://")) {
                 // Once we can get album art and meta data from MediaPlayer, we
                 // can show that info again when streaming.
-                getSupportActionBar().setSubtitle("");
+                getActionBar().setSubtitle("");
                 mAlbum.setVisibility(View.GONE);
-                getSupportActionBar().setTitle(path);
+                getActionBar().setTitle(path);
                 mAlbumArtHandler.removeMessages(GET_ALBUM_ART);
                 mAlbumArtHandler.obtainMessage(GET_ALBUM_ART, new AlbumSongIdWrapper(-1, -1)).sendToTarget();
             } else {
@@ -1104,14 +1082,14 @@ public class MediaPlaybackActivity extends ActionBarActivity implements MusicUti
                 if (MediaStore.UNKNOWN_STRING.equals(artistName)) {
                     artistName = getString(R.string.unknown_artist_name);
                 }
-                getSupportActionBar().setSubtitle(artistName);
+                getActionBar().setSubtitle(artistName);
                 String albumName = mService.getAlbumName();
                 long albumid = mService.getAlbumId();
                 if (MediaStore.UNKNOWN_STRING.equals(albumName)) {
                     albumName = getString(R.string.unknown_album_name);
                     albumid = -1;
                 }
-                getSupportActionBar().setTitle(mService.getTrackName());
+                getActionBar().setTitle(mService.getTrackName());
                 mAlbumArtHandler.removeMessages(GET_ALBUM_ART);
                 mAlbumArtHandler.obtainMessage(GET_ALBUM_ART, new AlbumSongIdWrapper(albumid, songid)).sendToTarget();
                 mAlbum.setVisibility(View.VISIBLE);
