@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
@@ -125,6 +126,7 @@ public class PlaylistBrowserActivity extends ListActivity
                     return;
                 }
                 MusicUtils.updateNowPlaying(PlaylistBrowserActivity.this);
+                invalidateOptionsMenu();
             }
 
             public void onServiceDisconnected(ComponentName classname) {
@@ -139,7 +141,7 @@ public class PlaylistBrowserActivity extends ListActivity
         registerReceiver(mScanListener, f);
 
         setContentView(R.layout.media_picker_activity);
-        MusicUtils.updateButtonBar(this, R.id.playlisttab);
+        MusicUtils.updateButtonBar(this, R.string.playlists_menu);
         ListView lv = getListView();
         lv.setOnCreateContextMenuListener(this);
         lv.setTextFilterEnabled(true);
@@ -155,7 +157,6 @@ public class PlaylistBrowserActivity extends ListActivity
                     new String[] { MediaStore.Audio.Playlists.NAME},
                     new int[] { android.R.id.text1 });
             setListAdapter(mAdapter);
-            setTitle(R.string.working_playlists);
             getPlaylistCursor(mAdapter.getQueryHandler(), null);
         } else {
             mAdapter.setActivity(this);
@@ -170,7 +171,6 @@ public class PlaylistBrowserActivity extends ListActivity
             if (mPlaylistCursor != null) {
                 init(mPlaylistCursor);
             } else {
-                setTitle(R.string.working_playlists);
                 getPlaylistCursor(mAdapter.getQueryHandler(), null);
             }
         }
@@ -216,6 +216,7 @@ public class PlaylistBrowserActivity extends ListActivity
 
         MusicUtils.setSpinnerState(this);
         MusicUtils.updateNowPlaying(PlaylistBrowserActivity.this);
+        invalidateOptionsMenu();
     }
     @Override
     public void onPause() {
@@ -258,12 +259,7 @@ public class PlaylistBrowserActivity extends ListActivity
             mLastListPosCourse = -1;
         }
         MusicUtils.hideDatabaseError(this);
-        MusicUtils.updateButtonBar(this, R.id.playlisttab);
-        setTitle();
-    }
-
-    private void setTitle() {
-        setTitle(R.string.playlists_title);
+        MusicUtils.updateButtonBar(this, R.string.playlists_menu);
     }
     
     @Override
@@ -272,8 +268,16 @@ public class PlaylistBrowserActivity extends ListActivity
             menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
         }
         
-        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
-        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+        		&& MusicUtils.isPlaying()) {
+	        menu.add(0, NOWPLAYING, 0, R.string.nowplaying_menu)
+        		.setIcon(android.R.drawable.ic_media_play)
+        		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        }
+        
+        menu.add(0, SEARCHBOX, 0, android.R.string.search_go)
+        	.setIcon(android.R.drawable.ic_menu_search)
+        	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         
         return super.onCreateOptionsMenu(menu);
     }
@@ -291,6 +295,10 @@ public class PlaylistBrowserActivity extends ListActivity
             case PARTY_SHUFFLE:
                 MusicUtils.togglePartyShuffle();
                 break;
+                
+            case NOWPLAYING:
+                startActivity(new Intent(this, MediaPlaybackActivity.class));
+                return true;
                 
             case SEARCHBOX:
             	onSearchRequested();

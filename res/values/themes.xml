@@ -1,31 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.Music" parent="Theme.Music.Base" />
+    <!-- the theme applied to the application or activity -->
+    <style name="AppTheme.MusicPlaybackActivity"
+           parent="@android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/Widget.MusicPlaybackActivity.ActionBar</item>
+    </style>
     
-    <style name="Theme.Music.Dialog" parent="Theme.AppCompat.Dialog"/>
-
-    <style name="Theme.Music.Base" parent="Theme.AppCompat">
-
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-
-        <!--
-         colorAccent is used as the default value for colorControlActivated,
-         which is used to tint widgets
-        -->
-        <item name="colorAccent">@color/colorAccent</item>
-
-        <!--
-         You can also set colorControlNormal, colorControlActivated
-         colorControlHighlight, and colorSwitchThumbNormal.
-        -->
-        
-		<item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-	</style>
-
+    <style name="AppTheme.MusicBrowserActivity" parent="@android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/Widget.MusicBrowserActivity.ActionBar</item>
+    </style>
+    
+<!-- ActionBar styles -->
+    <style name="Widget.MusicPlaybackActivity.ActionBar"
+           parent="@android:style/Widget.Holo.ActionBar.Solid">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:displayOptions">showTitle|showHome</item>
+    </style>
+    
+    <style name="Widget.MusicBrowserActivity.ActionBar"
+           parent="@android:style/Widget.Holo.ActionBar.Solid">
+    	<item name="android:displayOptions">showHome|useLogo|showTitle</item>
+    </style> 
 </resources>

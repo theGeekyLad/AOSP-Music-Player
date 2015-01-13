@@ -39,9 +39,12 @@
             android:name="android.app.default_searchable"
             android:value="com.snovbx.music.QueryBrowserActivity"
         />
-        <activity android:name="com.snovbx.music.MusicBrowserActivity"
+
+        <activity
+            android:name="com.snovbx.music.MusicBrowserActivity"
             android:exported="true"
-        >
+            android:theme="@style/AppTheme.MusicBrowserActivity" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.MUSIC_PLAYER" />
@@ -69,6 +72,7 @@
              appropriate. -->
         <activity android:name="com.snovbx.music.MediaPlaybackActivity"
                 android:label="@string/mediaplaybacklabel"
+                android:theme="@style/AppTheme.MusicPlaybackActivity"
                 android:launchMode="singleTop"
                 android:clearTaskOnLaunch="true"
                 android:exported="true" 
@@ -128,28 +132,35 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.snovbx.music.ArtistAlbumBrowserActivity" android:exported="false" >
+        <activity android:name="com.snovbx.music.ArtistAlbumBrowserActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.MusicBrowserActivity">
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="vnd.android.cursor.dir/artistalbum"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.snovbx.music.AlbumBrowserActivity" android:exported="false" >
+        <activity android:name="com.snovbx.music.AlbumBrowserActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.MusicBrowserActivity">
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="vnd.android.cursor.dir/album"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.snovbx.music.NowPlayingActivity" android:exported="false" >
+        <!-- <activity android:name="com.snovbx.music.NowPlayingActivity"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="vnd.android.cursor.dir/nowplaying"/>
             </intent-filter>
-        </activity>
-        <activity android:name="com.snovbx.music.TrackBrowserActivity" android:exported="false" >
+        </activity> -->
+        <activity android:name="com.snovbx.music.TrackBrowserActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.MusicBrowserActivity">
             <intent-filter>
                 <action android:name="android.intent.action.EDIT" />
                 <action android:name="android.intent.action.PICK" />
@@ -171,7 +182,8 @@
         </activity>
         <activity android:name="com.snovbx.music.PlaylistBrowserActivity"
                 android:label="@string/musicbrowserlabel" 
-                android:exported="true" >
+                android:exported="true"
+            	android:theme="@style/AppTheme.MusicBrowserActivity">
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
                 <category android:name="android.intent.category.DEFAULT" />

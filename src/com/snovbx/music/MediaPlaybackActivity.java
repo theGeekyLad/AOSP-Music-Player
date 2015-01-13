@@ -16,6 +16,8 @@
 
 package com.snovbx.music;
 
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.KeyguardManager;
@@ -31,6 +33,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -85,7 +88,7 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs
     }
 
     /** Called when the activity is first created. */
-    @Override
+	@Override
     public void onCreate(Bundle icicle)
     {
         super.onCreate(icicle);
@@ -93,11 +96,11 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs
 
         mAlbumArtWorker = new Worker("album art worker");
         mAlbumArtHandler = new AlbumArtHandler(mAlbumArtWorker.getLooper());
-
-        setContentView(R.layout.audio_player);
         
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
+        setContentView(R.layout.audio_player);
+        
         mCurrentTime = (TextView) findViewById(R.id.currenttime);
         mTotalTime = (TextView) findViewById(R.id.totaltime);
         mProgress = (ProgressBar) findViewById(android.R.id.progress);
@@ -238,7 +241,7 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs
             scanForward(repcnt, howlong);
         }
     };
-   
+    
     @Override
     public void onStop() {
         paused = true;

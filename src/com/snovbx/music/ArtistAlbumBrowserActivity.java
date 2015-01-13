@@ -30,6 +30,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.CursorWrapper;
@@ -105,7 +106,7 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
         registerReceiver(mScanListener, f);
 
         setContentView(R.layout.media_picker_activity_expanding);
-        MusicUtils.updateButtonBar(this, R.id.artisttab);
+        MusicUtils.updateButtonBar(this, R.string.browse_menu);
         ExpandableListView lv = getExpandableListView();
         lv.setOnCreateContextMenuListener(this);
         lv.setTextFilterEnabled(true);
@@ -124,7 +125,6 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
                     new String[] {},
                     new int[] {});
             setListAdapter(mAdapter);
-            setTitle(R.string.working_artists);
             getArtistCursor(mAdapter.getQueryHandler(), null);
         } else {
             mAdapter.setActivity(this);
@@ -202,6 +202,7 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
         public void onReceive(Context context, Intent intent) {
             getExpandableListView().invalidateViews();
             MusicUtils.updateNowPlaying(ArtistAlbumBrowserActivity.this);
+            invalidateOptionsMenu();
         }
     };
     private BroadcastReceiver mScanListener = new BroadcastReceiver() {
@@ -253,14 +254,9 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
         }
 
         MusicUtils.hideDatabaseError(this);
-        MusicUtils.updateButtonBar(this, R.id.artisttab);
-        setTitle();
+        MusicUtils.updateButtonBar(this, R.string.browse_menu);
     }
 
-    private void setTitle() {
-        setTitle(R.string.artists_title);
-    }
-    
     @Override
     public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
@@ -287,8 +283,17 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
         super.onCreateOptionsMenu(menu);
         menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
         menu.add(0, SHUFFLE_ALL, 0, R.string.shuffle_all).setIcon(R.drawable.ic_menu_shuffle);
-        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
-        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+        		&& MusicUtils.isPlaying()) {
+	        menu.add(0, NOWPLAYING, 0, R.string.nowplaying_menu)
+        		.setIcon(android.R.drawable.ic_media_play)
+        		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        }
+        
+        menu.add(0, SEARCHBOX, 0, android.R.string.search_go)
+        	.setIcon(android.R.drawable.ic_menu_search)
+        	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return true;
     }
     
@@ -316,6 +321,10 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
                     MusicUtils.shuffleAll(this, cursor);
                     cursor.close();
                 }
+                return true;
+                
+            case NOWPLAYING:
+                startActivity(new Intent(this, MediaPlaybackActivity.class));
                 return true;
                 
             case SEARCHBOX:
@@ -869,6 +878,7 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
 
     public void onServiceConnected(ComponentName name, IBinder service) {
         MusicUtils.updateNowPlaying(this);
+        invalidateOptionsMenu();
     }
 
     public void onServiceDisconnected(ComponentName name) {

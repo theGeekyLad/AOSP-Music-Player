@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -109,7 +110,7 @@ public class AlbumBrowserActivity extends ListActivity
         registerReceiver(mScanListener, f);
 
         setContentView(R.layout.media_picker_activity);
-        MusicUtils.updateButtonBar(this, R.id.albumtab);
+        MusicUtils.updateButtonBar(this, R.string.albums_menu);
         ListView lv = getListView();
         lv.setOnCreateContextMenuListener(this);
         lv.setTextFilterEnabled(true);
@@ -125,7 +126,6 @@ public class AlbumBrowserActivity extends ListActivity
                     new String[] {},
                     new int[] {});
             setListAdapter(mAdapter);
-            setTitle(R.string.working_albums);
             getAlbumCursor(mAdapter.getQueryHandler(), null);
         } else {
             mAdapter.setActivity(this);
@@ -199,6 +199,7 @@ public class AlbumBrowserActivity extends ListActivity
         public void onReceive(Context context, Intent intent) {
             getListView().invalidateViews();
             MusicUtils.updateNowPlaying(AlbumBrowserActivity.this);
+            invalidateOptionsMenu();
         }
     };
     private BroadcastReceiver mScanListener = new BroadcastReceiver() {
@@ -249,7 +250,7 @@ public class AlbumBrowserActivity extends ListActivity
         }
 
         MusicUtils.hideDatabaseError(this);
-        MusicUtils.updateButtonBar(this, R.id.albumtab);
+        MusicUtils.updateButtonBar(this, R.string.albums_menu);
         setTitle();
     }
 
@@ -265,8 +266,6 @@ public class AlbumBrowserActivity extends ListActivity
 
         if (mArtistId != null && fancyName != null)
             setTitle(fancyName);
-        else
-            setTitle(R.string.albums_title);
     }
 
     @Override
@@ -421,9 +420,17 @@ public class AlbumBrowserActivity extends ListActivity
         super.onCreateOptionsMenu(menu);
         menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
         menu.add(0, SHUFFLE_ALL, 0, R.string.shuffle_all).setIcon(R.drawable.ic_menu_shuffle);
+        
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+        		&& MusicUtils.isPlaying()) {
+	        menu.add(0, NOWPLAYING, 0, R.string.nowplaying_menu)
+        		.setIcon(android.R.drawable.ic_media_play)
+        		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        }
 
-        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
-        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(0, SEARCHBOX, 0, android.R.string.search_go)
+    		.setIcon(android.R.drawable.ic_menu_search)
+    		.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         return true;
     }
@@ -452,6 +459,10 @@ public class AlbumBrowserActivity extends ListActivity
                     MusicUtils.shuffleAll(this, cursor);
                     cursor.close();
                 }
+                return true;
+                
+            case NOWPLAYING:
+                startActivity(new Intent(this, MediaPlaybackActivity.class));
                 return true;
                 
             case SEARCHBOX:
@@ -685,6 +696,7 @@ public class AlbumBrowserActivity extends ListActivity
 
     public void onServiceConnected(ComponentName name, IBinder service) {
         MusicUtils.updateNowPlaying(this);
+        invalidateOptionsMenu();
     }
 
     public void onServiceDisconnected(ComponentName name) {

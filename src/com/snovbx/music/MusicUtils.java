@@ -16,7 +16,23 @@
 
 package com.snovbx.music;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Locale;
+
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar.TabListener;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -54,27 +70,19 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
-import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.snovbx.music.IMediaPlaybackService;
-import com.snovbx.music.R;
-
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Locale;
 
 public class MusicUtils {
 
     private static final String TAG = "MusicUtils";
+    
+    private static final int[] TABS = {
+    	R.string.browse_menu,
+    	R.string.albums_menu,
+    	R.string.tracks_menu,
+    	R.string.playlists_menu
+    };
 
     public interface Defs {
         public final static int OPEN_URL = 0;
@@ -92,7 +100,8 @@ public class MusicUtils {
         public final static int QUEUE = 12;
         public final static int EFFECTS_PANEL = 13;
         public final static int SEARCHBOX = 14;
-        public final static int CHILD_MENU_BASE = 15; // this should be the last item
+        public final static int NOWPLAYING = 15;
+        public final static int CHILD_MENU_BASE = 16; // this should be the last item
     }
 
     public static String makeAlbumsLabel(Context context, int numalbums, int numsongs, boolean isUnknown) {
@@ -715,10 +724,6 @@ public class MusicUtils {
         if (v != null) {
             v.setVisibility(View.GONE);
         }
-        v = a.findViewById(R.id.buttonbar);
-        if (v != null) {
-            v.setVisibility(View.GONE);
-        }
         TextView tv = (TextView) a.findViewById(R.id.sd_message);
         tv.setText(message);
     }
@@ -1146,86 +1151,75 @@ public class MusicUtils {
     
     static int sActiveTabIndex = -1;
     
-    static boolean updateButtonBar(Activity a, int highlight) {
-        final TabWidget ll = (TabWidget) a.findViewById(R.id.buttonbar);
+    private static class BrowseTabListener implements TabListener {
+    	boolean mSelected;
+    	
+    	public BrowseTabListener(boolean selected) {
+    		mSelected = selected;
+    	}
+    	@Override
+		public void onTabReselected(Tab tab, FragmentTransaction ft) {}
+
+		@Override
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+			if(!mSelected) {
+				mSelected = true;
+				activateTab((Activity) tab.getTag(), TABS[tab.getPosition()]);
+			}
+		}
+
+		@Override
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {}
+    }
+    
+    @SuppressLint("NewApi")
+	static boolean updateButtonBar(Activity a, int highlight) {
+    	ActionBar ab = a.getActionBar();
+        
         boolean withtabs = false;
         Intent intent = a.getIntent();
         if (intent != null) {
             withtabs = intent.getBooleanExtra("withtabs", false);
         }
         
+    	ab.removeAllTabs();        
         if (highlight == 0 || !withtabs) {
-            ll.setVisibility(View.GONE);
+        	ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             return withtabs;
         } else if (withtabs) {
-            ll.setVisibility(View.VISIBLE);
-        }
-        for (int i = ll.getChildCount() - 1; i >= 0; i--) {
-            
-            View v = ll.getChildAt(i);
-            boolean isActive = (v.getId() == highlight);
-            if (isActive) {
-                ll.setCurrentTab(i);
-                sActiveTabIndex = i;
+        	ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        	for(int i = 0; i < TABS.length; i++) {
+        		boolean selected = highlight == TABS[i];
+            	Tab tab = ab.newTab();
+                tab.setTag(a);
+                tab.setText(a.getString(TABS[i]));
+                tab.setTabListener(new MusicUtils.BrowseTabListener(selected));
+                ab.addTab(tab, i, selected);
             }
-            v.setTag(i);
-            v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (hasFocus) {
-                        for (int i = 0; i < ll.getTabCount(); i++) {
-                            if (ll.getChildTabViewAt(i) == v) {
-                                ll.setCurrentTab(i);
-                                processTabClick((Activity)ll.getContext(), v, ll.getChildAt(sActiveTabIndex).getId());
-                                break;
-                            }
-                        }
-                    }
-                }});
-            
-            v.setOnClickListener(new View.OnClickListener() {
-
-                public void onClick(View v) {
-                    processTabClick((Activity)ll.getContext(), v, ll.getChildAt(sActiveTabIndex).getId());
-                }});
         }
+        
         return withtabs;
-    }
-
-    static void processTabClick(Activity a, View v, int current) {
-        int id = v.getId();
-        if (id == current) {
-            return;
-        }
-
-        final TabWidget ll = (TabWidget) a.findViewById(R.id.buttonbar);
-
-        activateTab(a, id);
-        if (id != R.id.nowplayingtab) {
-            ll.setCurrentTab((Integer) v.getTag());
-            setIntPref(a, "activetab", id);
-        }
     }
     
     static void activateTab(Activity a, int id) {
+    	setIntPref(a, "activetab", id);
         Intent intent = new Intent(Intent.ACTION_PICK);
         switch (id) {
-            case R.id.artisttab:
+            case R.string.browse_menu:
                 intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/artistalbum");
                 break;
-            case R.id.albumtab:
+            case R.string.albums_menu:
                 intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/album");
                 break;
-            case R.id.songtab:
+            case R.string.tracks_menu:
                 intent.setDataAndType(Uri.EMPTY, "vnd.android.cursor.dir/track");
                 break;
-            case R.id.playlisttab:
+            case R.string.playlists_menu:
                 intent.setDataAndType(Uri.EMPTY, MediaStore.Audio.Playlists.CONTENT_TYPE);
                 break;
-            case R.id.nowplayingtab:
-                intent = new Intent(a, MediaPlaybackActivity.class);
-                a.startActivity(intent);
-                // fall through and return
+//            case R.string.nowplaying_title:
+//            	intent = new Intent(a, MediaPlaybackActivity.class);
+//                a.startActivity(intent);
             default:
                 return;
         }
@@ -1271,6 +1265,13 @@ public class MusicUtils {
         } catch (RemoteException ex) {
         }
         nowPlayingView.setVisibility(View.GONE);
+    }
+    
+    static boolean isPlaying() {
+    	try {
+			return MusicUtils.sService != null && MusicUtils.sService.getAudioId() != -1;
+		} catch (RemoteException e) {}
+    	return false;
     }
 
     static void setBackground(View v, Bitmap bm) {

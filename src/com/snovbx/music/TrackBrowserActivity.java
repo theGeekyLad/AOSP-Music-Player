@@ -20,6 +20,7 @@ import com.snovbx.music.IMediaPlaybackService;
 import com.snovbx.music.R;
 import com.snovbx.music.MusicUtils.ServiceToken;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.AsyncQueryHandler;
@@ -32,6 +33,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.database.AbstractCursor;
 import android.database.CharArrayBuffer;
 import android.database.Cursor;
@@ -116,8 +118,10 @@ public class TrackBrowserActivity extends ListActivity
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         Intent intent = getIntent();
         if (intent != null) {
-            if (intent.getBooleanExtra("withtabs", false)) {
-//                requestWindowFeature(Window.FEATURE_NO_TITLE);
+            if (!intent.getBooleanExtra("withtabs", false)) {
+            	ActionBar ab = getActionBar();
+            	ab.setDisplayHomeAsUpEnabled(true);
+            	ab.setDisplayShowTitleEnabled(true);
             }
         }
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -161,7 +165,7 @@ public class TrackBrowserActivity extends ListActivity
         };
 
         setContentView(R.layout.media_picker_activity);
-        mUseLastListPos = MusicUtils.updateButtonBar(this, R.id.songtab);
+        mUseLastListPos = MusicUtils.updateButtonBar(this, R.string.tracks_menu);
         mTrackList = getListView();
         mTrackList.setOnCreateContextMenuListener(this);
         mTrackList.setCacheColorHint(0);
@@ -212,7 +216,6 @@ public class TrackBrowserActivity extends ListActivity
                     mPlaylist != null &&
                     !(mPlaylist.equals("podcasts") || mPlaylist.equals("recentlyadded")));
             setListAdapter(mAdapter);
-            setTitle(R.string.working_songs);
             getTrackCursor(mAdapter.getQueryHandler(), null, true);
         } else {
             mTrackCursor = mAdapter.getCursor();
@@ -225,12 +228,12 @@ public class TrackBrowserActivity extends ListActivity
             if (mTrackCursor != null) {
                 init(mTrackCursor, false);
             } else {
-                setTitle(R.string.working_songs);
                 getTrackCursor(mAdapter.getQueryHandler(), null, true);
             }
         }
         if (!mEditMode) {
             MusicUtils.updateNowPlaying(this);
+            invalidateOptionsMenu();
         }
     }
     
@@ -375,7 +378,7 @@ public class TrackBrowserActivity extends ListActivity
         }
 
         MusicUtils.hideDatabaseError(this);
-        mUseLastListPos = MusicUtils.updateButtonBar(this, R.id.songtab);
+        mUseLastListPos = MusicUtils.updateButtonBar(this, R.string.tracks_menu);
         setTitle();
 
         // Restore previous position
@@ -514,8 +517,6 @@ public class TrackBrowserActivity extends ListActivity
 
         if (fancyName != null) {
             setTitle(fancyName);
-        } else {
-            setTitle(R.string.tracks_title);
         }
     }
     
@@ -583,6 +584,7 @@ public class TrackBrowserActivity extends ListActivity
             getListView().invalidateViews();
             if (!mEditMode) {
                 MusicUtils.updateNowPlaying(TrackBrowserActivity.this);
+                invalidateOptionsMenu();
             }
         }
     };
@@ -922,10 +924,18 @@ public class TrackBrowserActivity extends ListActivity
                 menu.add(0, CLEAR_PLAYLIST, 0, R.string.clear_playlist).setIcon(R.drawable.ic_menu_clear_playlist);
             }
         }
-        
+
         if(mPlaylist == null) {
-	        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
-	        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+            		&& MusicUtils.isPlaying()) {
+    	        menu.add(0, NOWPLAYING, 0, R.string.nowplaying_menu)
+            		.setIcon(android.R.drawable.ic_media_play)
+            		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            }
+        	
+	        menu.add(0, SEARCHBOX, 0, android.R.string.search_go)
+        		.setIcon(android.R.drawable.ic_menu_search)
+        		.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         }
 
         return true;
@@ -942,6 +952,10 @@ public class TrackBrowserActivity extends ListActivity
         Intent intent;
         Cursor cursor;
         switch (item.getItemId()) {
+        	case android.R.id.home:
+        		finish();
+        		return true;
+        		
             case PLAY_ALL: {
                 MusicUtils.playAll(this, mTrackCursor);
                 return true;
@@ -972,6 +986,10 @@ public class TrackBrowserActivity extends ListActivity
             case CLEAR_PLAYLIST:
                 // We only clear the current playlist
                 MusicUtils.clearQueue();
+                return true;
+                
+            case NOWPLAYING:
+                startActivity(new Intent(this, MediaPlaybackActivity.class));
                 return true;
                 
             case SEARCHBOX:

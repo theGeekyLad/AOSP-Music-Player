@@ -1274,7 +1274,11 @@ public class MediaPlaybackService extends Service {
         	status.category = Notification.CATEGORY_TRANSPORT;
         }
         
-        mNotificationManager.notify(PLAYBACKSERVICE_STATUS, status);
+        if(mPlayListLen == 0) {
+            mNotificationManager.cancel(PLAYBACKSERVICE_STATUS);
+        } else {
+        	mNotificationManager.notify(PLAYBACKSERVICE_STATUS, status);
+        }
     }
 
     private void stop(boolean remove_status_icon) {
