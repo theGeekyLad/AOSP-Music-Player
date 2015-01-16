@@ -44,7 +44,9 @@ interface IMediaPlaybackService
     void setQueuePosition(int index);
     String getPath();
     long getAudioId();
+    void setStopsAfterCurrentTrack(boolean stops);
     void setShuffleMode(int shufflemode);
+    boolean getIfStopsAfterCurrentTrack();
     int getShuffleMode();
     int removeTracks(int first, int last);
     int removeTrack(long id);

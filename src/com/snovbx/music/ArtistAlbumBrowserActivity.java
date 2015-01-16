@@ -337,6 +337,7 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfoIn) {
         menu.add(0, PLAY_SELECTION, 0, R.string.play_selection);
+        menu.add(0, QUEUE_AS_NEXT, 0, R.string.queue_as_next);
         SubMenu sub = menu.addSubMenu(0, ADD_TO_PLAYLIST, 0, R.string.add_to_playlist);
         MusicUtils.makePlaylistMenu(this, sub);
         menu.add(0, DELETE_ITEM, 0, R.string.delete_item);
@@ -409,6 +410,15 @@ public class ArtistAlbumBrowserActivity extends ExpandableListActivity
                         
                 MusicUtils.playAll(this, list, 0);
                 return true;
+            }
+            
+            case QUEUE_AS_NEXT: {
+                long [] list =
+                    mCurrentArtistId != null ?
+                    MusicUtils.getSongListForArtist(this, Long.parseLong(mCurrentArtistId))
+                    : MusicUtils.getSongListForAlbum(this, Long.parseLong(mCurrentAlbumId));
+            	MusicUtils.addToCurrentPlaylist(this, list, true);
+            	return true;
             }
 
             case QUEUE: {

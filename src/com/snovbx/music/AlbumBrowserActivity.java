@@ -271,6 +271,7 @@ public class AlbumBrowserActivity extends ListActivity
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfoIn) {
         menu.add(0, PLAY_SELECTION, 0, R.string.play_selection);
+        menu.add(0, QUEUE_AS_NEXT, 0, R.string.queue_as_next);
         SubMenu sub = menu.addSubMenu(0, ADD_TO_PLAYLIST, 0, R.string.add_to_playlist);
         MusicUtils.makePlaylistMenu(this, sub);
         menu.add(0, DELETE_ITEM, 0, R.string.delete_item);
@@ -293,9 +294,6 @@ public class AlbumBrowserActivity extends ListActivity
         if (!mIsUnknownAlbum || !mIsUnknownArtist) {
             menu.add(0, SEARCH, 0, R.string.search_title);
         }
-        
-        MenuItem search = menu.add(0, SEARCHBOX, 0, android.R.string.search_go).setIcon(android.R.drawable.ic_menu_search);
-        search.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
     }
 
     @Override
@@ -306,6 +304,12 @@ public class AlbumBrowserActivity extends ListActivity
                 long [] list = MusicUtils.getSongListForAlbum(this, Long.parseLong(mCurrentAlbumId));
                 MusicUtils.playAll(this, list, 0);
                 return true;
+            }
+            
+            case QUEUE_AS_NEXT: {
+                long [] list = MusicUtils.getSongListForAlbum(this, Long.parseLong(mCurrentAlbumId));
+            	MusicUtils.addToCurrentPlaylist(this, list, true);
+            	return true;
             }
 
             case QUEUE: {

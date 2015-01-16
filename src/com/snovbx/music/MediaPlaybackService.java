@@ -119,6 +119,7 @@ public class MediaPlaybackService extends Service {
     
     private MultiPlayer mPlayer;
     private String mFileToPlay;
+    private boolean mStopsAfterCurrentTrack = false;
     private int mShuffleMode = SHUFFLE_NONE;
     private int mRepeatMode = REPEAT_NONE;
     private int mMediaMountedCount = 0;
@@ -218,6 +219,10 @@ public class MediaPlaybackService extends Service {
                     notifyChange(META_CHANGED);
                     updateNotification();
                     setNextTrack();
+                    if(mStopsAfterCurrentTrack) {
+                    	mStopsAfterCurrentTrack = false;
+                    	pause();
+                    }
                     break;
                 case TRACK_ENDED:
                     if (mRepeatMode == REPEAT_CURRENT) {
@@ -870,7 +875,7 @@ public class MediaPlaybackService extends Service {
         
         // move part of list after insertion point
         int tailsize = mPlayListLen - position;
-        for (int i = tailsize ; i > 0 ; i--) {
+        for (int i = tailsize ; i >= addlen ; i--) {
             mPlayList[position + i] = mPlayList[position + i - addlen]; 
         }
         
@@ -899,17 +904,21 @@ public class MediaPlaybackService extends Service {
         synchronized(this) {
             if (action == NEXT && mPlayPos + 1 < mPlayListLen) {
                 addToPlayList(list, mPlayPos + 1);
+                setNextTrack();
                 notifyChange(QUEUE_CHANGED);
             } else {
+            	boolean playListEmpty = mPlayListLen <= 0;
                 // action == LAST || action == NOW || mPlayPos + 1 == mPlayListLen
                 addToPlayList(list, Integer.MAX_VALUE);
                 notifyChange(QUEUE_CHANGED);
-                if (action == NOW) {
+                if (action == NOW || playListEmpty) {
                     mPlayPos = mPlayListLen - list.length;
                     openCurrentAndNext();
                     play();
                     notifyChange(META_CHANGED);
                     return;
+                } else {
+                	setNextTrack();
                 }
             }
             if (mPlayPos < 0) {
@@ -1643,6 +1652,9 @@ public class MediaPlaybackService extends Service {
         if (numremoved > 0) {
             notifyChange(QUEUE_CHANGED);
         }
+        if (mShuffleMode == SHUFFLE_AUTO) {
+        	setShuffleMode(SHUFFLE_NONE);
+        }
         return numremoved;
     }
     
@@ -1685,6 +1697,8 @@ public class MediaPlaybackService extends Service {
                     }
                 }
                 notifyChange(META_CHANGED);
+            } else {
+            	setNextTrack();
             }
             return last - first + 1;
         }
@@ -1712,6 +1726,10 @@ public class MediaPlaybackService extends Service {
         return numremoved;
     }
     
+    public void setStopsAfterCurrentTrack(boolean stops) {
+    	mStopsAfterCurrentTrack = stops;
+    }
+    
     public void setShuffleMode(int shufflemode) {
         synchronized(this) {
             if (mShuffleMode == shufflemode && mPlayListLen > 0) {
@@ -1735,6 +1753,11 @@ public class MediaPlaybackService extends Service {
             saveQueue(false);
         }
     }
+    
+    public boolean getIfStopsAfterCurrentTrack() {
+    	return mStopsAfterCurrentTrack;
+    }
+    
     public int getShuffleMode() {
         return mShuffleMode;
     }
@@ -2219,8 +2242,14 @@ public class MediaPlaybackService extends Service {
         public long seek(long pos) {
             return mService.get().seek(pos);
         }
+        public void setStopsAfterCurrentTrack(boolean stops) {
+        	mService.get().setStopsAfterCurrentTrack(stops);
+        }
         public void setShuffleMode(int shufflemode) {
             mService.get().setShuffleMode(shufflemode);
+        }
+        public boolean getIfStopsAfterCurrentTrack() {
+        	return mService.get().getIfStopsAfterCurrentTrack();
         }
         public int getShuffleMode() {
             return mService.get().getShuffleMode();

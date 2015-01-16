@@ -94,14 +94,16 @@ public class MusicUtils {
         public final static int GOTO_START = 6;
         public final static int GOTO_PLAYBACK = 7;
         public final static int PARTY_SHUFFLE = 8;
-        public final static int SHUFFLE_ALL = 9;
-        public final static int DELETE_ITEM = 10;
-        public final static int SCAN_DONE = 11;
-        public final static int QUEUE = 12;
-        public final static int EFFECTS_PANEL = 13;
-        public final static int SEARCHBOX = 14;
-        public final static int NOWPLAYING = 15;
-        public final static int CHILD_MENU_BASE = 16; // this should be the last item
+        public final static int STOP_AFTER_CURRENT_TRACK = 9;
+        public final static int SHUFFLE_ALL = 10;
+        public final static int DELETE_ITEM = 11;
+        public final static int SCAN_DONE = 12;
+        public final static int QUEUE = 13;
+        public final static int QUEUE_AS_NEXT = 14;
+        public final static int EFFECTS_PANEL = 15;
+        public final static int SEARCHBOX = 16;
+        public final static int NOWPLAYING = 17;
+        public final static int CHILD_MENU_BASE = 18; // this should be the last item
     }
 
     public static String makeAlbumsLabel(Context context, int numalbums, int numsongs, boolean isUnknown) {
@@ -264,6 +266,17 @@ public class MusicUtils {
         return -1;
     }
     
+    public static boolean getIfStopsAfterCurrentTrack() {
+    	boolean stops = false;
+    	if (sService != null) {
+    		try {
+    			stops = sService.getIfStopsAfterCurrentTrack();
+    		} catch (RemoteException ex) {
+    		}
+    	}
+    	return stops;
+    }
+    
     public static int getCurrentShuffleMode() {
         int mode = MediaPlaybackService.SHUFFLE_NONE;
         if (sService != null) {
@@ -301,6 +314,15 @@ public class MusicUtils {
             } else {
             	item.setChecked(false);
             }
+        }
+    }
+    
+    public static void setStopsAfterCurrentTrackMenuIcon(Menu menu) {
+    	MenuItem item = menu.findItem(Defs.STOP_AFTER_CURRENT_TRACK);
+        if (item != null) {
+            boolean stops = MusicUtils.getIfStopsAfterCurrentTrack();
+            item.setCheckable(true);
+            item.setChecked(stops);
         }
     }
 
@@ -535,11 +557,16 @@ public class MusicUtils {
     }
     
     public static void addToCurrentPlaylist(Context context, long [] list) {
-        if (sService == null) {
+        addToCurrentPlaylist(context, list, false);
+    }
+    
+    public static void addToCurrentPlaylist(Context context, long [] list, boolean asNext) {
+    	if (sService == null) {
             return;
         }
         try {
-            sService.enqueue(list, MediaPlaybackService.LAST);
+        	int position = asNext ? MediaPlaybackService.NEXT : MediaPlaybackService.LAST;
+            sService.enqueue(list, position);
             String message = context.getResources().getQuantityString(
                     R.plurals.NNNtrackstoplaylist, list.length, Integer.valueOf(list.length));
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
@@ -835,6 +862,21 @@ public class MusicUtils {
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intent);
         }
+    }
+    
+    public static void toggleStopsAfterCurrentTrack() {
+    	try {
+    		boolean stops = sService.getIfStopsAfterCurrentTrack();
+    		sService.setStopsAfterCurrentTrack(!stops);
+    	} catch (RemoteException ex) {
+    	}
+    }
+    
+    public static void setStopsAfterCurrentTrack(boolean stops) {
+    	try {
+    		sService.setStopsAfterCurrentTrack(stops);
+    	} catch (RemoteException ex) {
+    	}
     }
     
     public static void clearQueue() {

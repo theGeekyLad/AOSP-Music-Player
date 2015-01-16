@@ -301,6 +301,8 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs
         // modes, instead of tailoring them to the specific file being played.
         if (MusicUtils.getCurrentAudioId() >= 0) {
             menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
+            menu.add(0, STOP_AFTER_CURRENT_TRACK, 0, R.string.stop_after_current_track);
+
             SubMenu sub = menu.addSubMenu(0, ADD_TO_PLAYLIST, 0,
                     R.string.add_to_playlist).setIcon(android.R.drawable.ic_menu_add);
             // these next two are in a separate group, so they can be shown/hidden as needed
@@ -328,6 +330,7 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs
     public boolean onPrepareOptionsMenu(Menu menu) {
         //if (mService == null) return false;
         MusicUtils.setPartyShuffleMenuIcon(menu);
+        MusicUtils.setStopsAfterCurrentTrackMenuIcon(menu);
 
         MenuItem  item = menu.findItem(ADD_TO_PLAYLIST);
         if (item != null) {
@@ -376,6 +379,10 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs
                     MusicUtils.togglePartyShuffle();
                     setShuffleButtonImage();
                     break;
+                    
+                case STOP_AFTER_CURRENT_TRACK:
+                	MusicUtils.toggleStopsAfterCurrentTrack();
+                	break;
                     
                 case NEW_PLAYLIST: {
                     intent = new Intent();

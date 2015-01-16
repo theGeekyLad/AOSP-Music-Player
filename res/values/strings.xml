@@ -197,7 +197,7 @@
     <!-- Context menu item -->
     <string name="add_to_playlist">Add to playlist</string>
     <!-- Context menu item -->
-    <string name="queue">Current playlist</string>
+    <string name="queue">Now playing</string>
     <!-- Context menu item -->
     <string name="new_playlist">New</string>
     <!-- Template for newly created playlist name -->
@@ -312,5 +312,7 @@
     <!-- Menu text for the item controlling the audio effects panel [CHAR LIMIT=15] -->
     <string name="effectspanel">Sound effects</string>
     <string name="nowplaying_menu">Now Playing</string>
+    <string name="queue_as_next">Play after current song</string>
+    <string name="stop_after_current_track">Stop after this song</string>
 </resources>
 
