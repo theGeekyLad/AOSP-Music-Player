@@ -208,6 +208,13 @@ public class MediaPlaybackService extends Service {
                     }
                     break;
                 case TRACK_WENT_TO_NEXT:
+                    if(mStopsAfterCurrentTrack) {
+                        pause();
+                        mStopsAfterCurrentTrack = false;
+                        mPausedByTransientLossOfFocus = false;
+                        seek(0);
+                    }
+
                     mPlayPos = mNextPlayPos;
                     if (mCursor != null) {
                         mCursor.close();
@@ -219,10 +226,6 @@ public class MediaPlaybackService extends Service {
                     notifyChange(META_CHANGED);
                     updateNotification();
                     setNextTrack();
-                    if(mStopsAfterCurrentTrack) {
-                    	mStopsAfterCurrentTrack = false;
-                    	pause();
-                    }
                     break;
                 case TRACK_ENDED:
                     if (mRepeatMode == REPEAT_CURRENT) {
