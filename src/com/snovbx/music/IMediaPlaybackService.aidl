@@ -1,6 +1,7 @@
 /* //device/samples/SampleCode/src/com/android/samples/app/RemoteServiceInterface.java
 **
 ** Copyright 2007, The Android Open Source Project
+** Copyright 2015, Fabio K (https://github.com/flk92)
 **
 ** Licensed under the Apache License, Version 2.0 (the "License"); 
 ** you may not use this file except in compliance with the License. 
