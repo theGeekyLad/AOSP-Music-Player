@@ -253,15 +253,15 @@
     <string name="clear_playlist">Clear playlist</string>
 
     <!-- Activity label. This might show up in the activity-picker -->
-    <string name="musicbrowserlabel">Music</string>
+    <string name="musicbrowserlabel">Music+</string>
     <!-- Activity label. This might show up in the activity-picker -->
     <string name="musicshortcutlabel">Music playlist</string>
     <!-- Activity label. This might show up in the activity-picker -->
-    <string name="mediaplaybacklabel">Music</string>
+    <string name="mediaplaybacklabel">Music+</string>
     <!-- Activity label. This might show up in the activity-picker -->
     <string name="videobrowserlabel">Videos</string>
     <!-- Activity label. This might show up in the activity-picker -->
-    <string name="mediapickerlabel">Music</string>
+    <string name="mediapickerlabel">Music+</string>
 
     <!-- Shown as a transient message whenever a file fails to play -->
     <string name="playback_failed">The player doesn\'t support this type of audio file.</string>
