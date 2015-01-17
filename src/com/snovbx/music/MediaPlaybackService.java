@@ -1273,10 +1273,6 @@ public class MediaPlaybackService extends Service {
         Notification status = new NotificationCompat.Builder(this).build();
         status.contentView = views;
         
-        if(mIsSupposedToBePlaying) {
-        	status.flags |= Notification.FLAG_ONGOING_EVENT;
-        }
-        
         status.icon = R.drawable.stat_notify_musicplayer;
         status.contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent("com.snovbx.music.PLAYBACK_VIEWER")
@@ -1284,12 +1280,22 @@ public class MediaPlaybackService extends Service {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         	status.visibility = Notification.VISIBILITY_PUBLIC;
         	status.category = Notification.CATEGORY_TRANSPORT;
+            status.flags |= Notification.FLAG_LOCAL_ONLY;
         }
         
         if(mPlayListLen == 0) {
-            mNotificationManager.cancel(PLAYBACKSERVICE_STATUS);
+        	stopForeground(true);
         } else {
-        	mNotificationManager.notify(PLAYBACKSERVICE_STATUS, status);
+        	if(mIsSupposedToBePlaying) {
+        		startForeground(PLAYBACKSERVICE_STATUS, status);
+        	} else {
+        		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        			stopForeground(true);
+        		} else {
+        			stopForeground(false);
+        		}
+        		mNotificationManager.notify(PLAYBACKSERVICE_STATUS, status);
+        	}
         }
     }
 
@@ -1730,7 +1736,9 @@ public class MediaPlaybackService extends Service {
     }
     
     public void setStopsAfterCurrentTrack(boolean stops) {
-    	mStopsAfterCurrentTrack = stops;
+    	synchronized(this) {
+    		mStopsAfterCurrentTrack = stops;
+    	}
     }
     
     public void setShuffleMode(int shufflemode) {

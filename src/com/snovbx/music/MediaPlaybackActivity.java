@@ -295,35 +295,29 @@ public class MediaPlaybackActivity extends Activity implements MusicUtils.Defs
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        // Don't show the menu items if we got launched by path/filedescriptor, or
-        // if we're in one shot mode. In most cases, these menu items are not
-        // useful in those modes, so for consistency we never show them in these
-        // modes, instead of tailoring them to the specific file being played.
-        if (MusicUtils.getCurrentAudioId() >= 0) {
-            menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
-            menu.add(0, STOP_AFTER_CURRENT_TRACK, 0, R.string.stop_after_current_track);
 
-            SubMenu sub = menu.addSubMenu(0, ADD_TO_PLAYLIST, 0,
-                    R.string.add_to_playlist).setIcon(android.R.drawable.ic_menu_add);
-            // these next two are in a separate group, so they can be shown/hidden as needed
-            // based on the keyguard state
-            menu.add(1, USE_AS_RINGTONE, 0, R.string.ringtone_menu_short)
-                    .setIcon(R.drawable.ic_menu_set_as_ringtone);
-            menu.add(1, DELETE_ITEM, 0, R.string.delete_item)
-                    .setIcon(R.drawable.ic_menu_delete);
-            
-            menu.add(0, QUEUE, 0, R.string.queue)
-            		.setIcon(R.drawable.ic_mp_current_playlist_btn)
-            		.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0, PARTY_SHUFFLE, 0, R.string.party_shuffle); // icon will be set in onPrepareOptionsMenu()
+        menu.add(0, STOP_AFTER_CURRENT_TRACK, 0, R.string.stop_after_current_track);
 
-            Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-            if (getPackageManager().resolveActivity(i, 0) != null) {
-                menu.add(0, EFFECTS_PANEL, 0, R.string.effectspanel).setIcon(R.drawable.ic_menu_eq);
-            }
+        SubMenu sub = menu.addSubMenu(0, ADD_TO_PLAYLIST, 0,
+        		R.string.add_to_playlist).setIcon(android.R.drawable.ic_menu_add);
+        // these next two are in a separate group, so they can be shown/hidden as needed
+        // based on the keyguard state
+        menu.add(1, USE_AS_RINGTONE, 0, R.string.ringtone_menu_short)
+        .setIcon(R.drawable.ic_menu_set_as_ringtone);
+        menu.add(1, DELETE_ITEM, 0, R.string.delete_item)
+        .setIcon(R.drawable.ic_menu_delete);
 
-            return true;
+        menu.add(0, QUEUE, 0, R.string.queue)
+        .setIcon(R.drawable.ic_mp_current_playlist_btn)
+        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+        if (getPackageManager().resolveActivity(i, 0) != null) {
+        	menu.add(0, EFFECTS_PANEL, 0, R.string.effectspanel).setIcon(R.drawable.ic_menu_eq);
         }
-        return false;
+
+        return true;
     }
 
     @Override

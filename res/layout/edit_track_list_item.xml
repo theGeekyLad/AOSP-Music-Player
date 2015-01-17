@@ -23,7 +23,7 @@
     android:orientation="vertical"
     android:baselineAligned="false">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="66dip"
         android:gravity="center_vertical"
