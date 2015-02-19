@@ -1662,9 +1662,6 @@ public class MediaPlaybackService extends Service {
         if (numremoved > 0) {
             notifyChange(QUEUE_CHANGED);
         }
-        if (mShuffleMode == SHUFFLE_AUTO) {
-        	setShuffleMode(SHUFFLE_NONE);
-        }
         return numremoved;
     }
     
