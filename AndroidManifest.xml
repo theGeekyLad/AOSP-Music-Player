@@ -21,7 +21,7 @@
         android:versionCode="2">
 
     <original-package android:name="com.android.music" />
-    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="21"/>
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="22"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
