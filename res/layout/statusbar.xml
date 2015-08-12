@@ -37,7 +37,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="8dp"
         android:layout_toRightOf="@+id/icon"
-        android:layout_toLeftOf="@+id/playpause"
+        android:layout_toLeftOf="@+id/previous"
         android:orientation="vertical" >
 
         <TextView
@@ -71,6 +71,15 @@
             android:scrollHorizontally="true" />
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/previous"
+        style="@android:style/MediaButton.Previous"
+        android:padding="0dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_toLeftOf="@+id/playpause"
+        android:layout_centerVertical="true" />
+    
     <ImageButton
         android:id="@+id/playpause"
         style="@android:style/MediaButton.Pause"

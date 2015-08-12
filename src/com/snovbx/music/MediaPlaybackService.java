@@ -1237,6 +1237,11 @@ public class MediaPlaybackService extends Service {
         PendingIntent pending_intent = PendingIntent.getService(this, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.playpause, pending_intent);
         
+        intent = new Intent(MediaPlaybackService.PREVIOUS_ACTION);
+        intent.setComponent(component_name);
+        pending_intent = PendingIntent.getService(this, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.previous, pending_intent);
+        
         intent = new Intent(MediaPlaybackService.NEXT_ACTION);
         intent.setComponent(component_name);
         pending_intent = PendingIntent.getService(this, 0, intent, 0);
